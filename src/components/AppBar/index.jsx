@@ -28,6 +28,8 @@ function AppBar() {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        gap: 2,
+        overflowX: "auto",
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -37,6 +39,7 @@ function AppBar() {
             component={TrelloIcon}
             inheritViewBox
             sx={{ color: "primary.main" }}
+            fontSize="small"
           />
           <Typography
             variant="span"
@@ -49,11 +52,19 @@ function AppBar() {
             Trello
           </Typography>
         </Box>
-        <Workspaces />
-        <Recent />
-        <Starred />
-        <Templates />
-        <Button variant="outlined">Create</Button>
+
+        <Box
+          sx={{
+            display: { xs: "none", md: "flex" },
+            gap: 1,
+          }}
+        >
+          <Workspaces />
+          <Recent />
+          <Starred />
+          <Templates />
+          <Button variant="outlined">Create</Button>
+        </Box>
       </Box>
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -62,15 +73,18 @@ function AppBar() {
           label="Search..."
           type="search"
           size="small"
+          sx={{ minWidth: 120 }}
         />
         <ModeSelect />
         <Tooltip title="Notifications" arrow>
           <Badge color="secondary" variant="dot" sx={{ cursor: "pointer" }}>
-            <NotificationsNone />
+            <NotificationsNone sx={{ color: "primary.main" }} />
           </Badge>
         </Tooltip>
         <Tooltip title="Help" arrow>
-          <HelpOutlineOutlinedIcon sx={{ cursor: "pointer" }} />
+          <HelpOutlineOutlinedIcon
+            sx={{ cursor: "pointer", color: "primary.main" }}
+          />
         </Tooltip>
         <Profiles />
       </Box>
