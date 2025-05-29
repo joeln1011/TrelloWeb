@@ -8,16 +8,18 @@ import Box from "@mui/material/Box";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeOutlineedIcon from "@mui/icons-material/DarkModeOutlined";
 import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
-import { useState } from "react";
+import { useColorScheme } from "@mui/material/styles";
 
 function ModeSelect() {
-  const [mode, setMode] = useState("system");
+  const { mode, setMode } = useColorScheme();
 
   const handleModeChange = (event) => {
-    setMode(event.target.value);
+    const selectedMode = event.target.value;
+    setMode(selectedMode);
   };
+
   return (
-    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+    <FormControl sx={{ minWidth: 120 }} size="small">
       <InputLabel id="label-select-dark-light-mode">Mode</InputLabel>
       <Select
         labelId="label-select-dark-light-mode"
