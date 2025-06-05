@@ -20,12 +20,14 @@ import AddCard from "@mui/icons-material/AddCard";
 import DragHandle from "@mui/icons-material/DragHandle";
 
 import ListCards from "./ListCards/ListCards";
+import { mapOrder } from "~/utils/sorts";
 
-function Column() {
+function Column({ column }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
+  const orderedCards = mapOrder(column?.cards, column?.cardOrderIds, "_id");
   return (
     <Box
       sx={{
@@ -54,7 +56,7 @@ function Column() {
           variant="h6"
           sx={{ fontSize: "1rem", fontWeight: "bold", cursor: "pointer" }}
         >
-          Column Title
+          {column?.title}
         </Typography>
         <Box>
           <Tooltip title="More Options">
@@ -118,7 +120,7 @@ function Column() {
       </Box>
 
       {/* ListCards */}
-      <ListCards />
+      <ListCards cards={orderedCards} />
 
       {/* Box Column Footers */}
       <Box
