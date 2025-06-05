@@ -30,7 +30,7 @@ function ModeSelect() {
         labelId="label-select-dark-light-mode"
         id="select-dark-light-mode"
         label="Mode"
-        value={mode}
+        value={mode || ""}
         onChange={handleModeChange}
         sx={{
           color: "white",
