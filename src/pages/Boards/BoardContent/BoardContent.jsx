@@ -11,6 +11,7 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
+  closestCorners,
   defaultDropAnimationSideEffects,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
@@ -178,10 +179,11 @@ function BoardContent({ board }) {
   };
   return (
     <DndContext
+      sensors={mySensors}
+      collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
-      sensors={mySensors}
     >
       <Box
         sx={{
