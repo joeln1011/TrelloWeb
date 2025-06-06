@@ -11,7 +11,27 @@ import Group from "@mui/icons-material/Group";
 import Attachment from "@mui/icons-material/Attachment";
 import Comment from "@mui/icons-material/Comment";
 
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
 const Card = ({ card }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: card._id, data: { ...card } });
+
+  const dndKitCardStyles = {
+    //touchAction: "none",
+
+    transform: CSS.Translate.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+  };
+
   const shouldShowCardActions = () => {
     return (
       !!card?.memberIds?.length ||
@@ -21,6 +41,10 @@ const Card = ({ card }) => {
   };
   return (
     <MuiCard
+      ref={setNodeRef}
+      style={dndKitCardStyles}
+      {...attributes}
+      {...listeners}
       sx={{
         cursor: "pointer",
         boxShadow: "0 1px 1px rgba(0,0,0,0.2)",
