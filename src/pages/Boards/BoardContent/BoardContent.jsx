@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import ListColumns from "./ListColumns/ListColumns";
 
 import { mapOrder } from "~/utils/sorts";
-
+import { cloneDeep } from "lodash";
 import {
   DndContext,
   DragOverlay,
@@ -49,6 +49,13 @@ function BoardContent({ board }) {
     setOrderedColumns(mapOrder(board?.columns, board?.columnOrderIds, "_id"));
   }, [board]);
 
+  //Find Column by CardId
+  const findColumnByCardId = (cardId) => {
+    return orderedColumns.find((column) =>
+      column?.cards?.map((card) => card._id)?.includes(cardId)
+    );
+  };
+
   // This function is called when the drag operation starts
   const handleDragStart = (event) => {
     setActiveDragItemId(event?.active?.id);
@@ -60,11 +67,91 @@ function BoardContent({ board }) {
     setActiveDragItemData(event?.active?.data?.current);
   };
 
+  //Triggered when the item is dragged over another item
+  const handleDragOver = (event) => {
+    // Return if the active drag item is a column
+    if (activeDragItemType === ACTIVE_DRAP_ITEM_TYPE.COLUMN) return;
+    const { active, over } = event;
+
+    if (!active || !over) return;
+    const {
+      id: activeDraggingCardId,
+      data: { current: activeDraggingCardData },
+    } = active;
+    const { id: overCardId } = over;
+
+    const activeColumn = findColumnByCardId(activeDraggingCardId);
+    const overColumn = findColumnByCardId(overCardId);
+
+    // Trigger when dragging a card over a different column,if same column do nothing
+    if (!activeColumn || !overColumn) return;
+
+    if (activeColumn._id !== overColumn._id) {
+      setOrderedColumns((prevColumns) => {
+        //find the index of the active column
+        const overCardIndex = overColumn?.cards?.findIndex(
+          (card) => card._id === overCardId
+        );
+        let newCardIndex;
+        const isBeLowOverItem =
+          active.rect.current.translated &&
+          active.rect.current.translated.top > over.rect.top + over.rect.height;
+
+        const modifier = isBeLowOverItem ? 1 : 0;
+        newCardIndex =
+          overCardIndex >= 0
+            ? newCardIndex + modifier
+            : overColumn?.cards?.length + 1;
+        const nextColumns = cloneDeep(prevColumns);
+
+        const nextActiveColumn = nextColumns.find(
+          (col) => col._id === activeColumn._id
+        );
+        const nextOverColumn = nextColumns.find(
+          (col) => col._id === overColumn._id
+        );
+
+        // Remove the card from the active column
+        if (nextActiveColumn) {
+          nextActiveColumn.cards = nextActiveColumn.cards.filter(
+            (card) => card._id !== activeDraggingCardId
+          );
+          // Update the card order IDs in the active column
+          nextActiveColumn.cardOrderIds = nextActiveColumn.cards.map(
+            (card) => card._id
+          );
+        }
+
+        if (nextOverColumn) {
+          // Check card existence before adding
+          nextActiveColumn.cards = nextActiveColumn.cards.filter(
+            (card) => card._id !== activeDraggingCardId
+          );
+
+          // Adding the card to the over column at the new index
+          nextOverColumn.cards = nextOverColumn.cards.toSpliced(
+            newCardIndex,
+            0,
+            activeDraggingCardData
+          );
+          // Update the card order IDs in the over column
+          nextOverColumn.cardOrderIds = nextOverColumn.cards.map(
+            (card) => card._id
+          );
+        }
+        console.log({ nextColumns });
+        return nextColumns;
+      });
+    }
+  };
+
   // This function is called when the drag operation ends
   const handleDragEnd = (event) => {
-    console.log("Drag ended:", event);
+    if (activeDragItemType === ACTIVE_DRAP_ITEM_TYPE.CARD) {
+      return;
+    }
     const { active, over } = event;
-    //if
+
     if (!active || !over) return;
 
     if (active.id !== over.id) {
@@ -92,6 +179,7 @@ function BoardContent({ board }) {
   return (
     <DndContext
       onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
       sensors={mySensors}
     >
