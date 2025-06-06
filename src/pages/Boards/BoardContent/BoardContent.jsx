@@ -6,13 +6,21 @@ import { mapOrder } from "~/utils/sorts";
 
 import {
   DndContext,
-  PointerSensor,
+  DragOverlay,
   MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
+  defaultDropAnimationSideEffects,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
+import Column from "./ListColumns/Column/Column";
+import Card from "./ListColumns/Column/ListCards/Card/Card";
+
+const ACTIVE_DRAP_ITEM_TYPE = {
+  COLUMN: "ACTIVE_DRAP_ITEM_TYPE_COLUMN",
+  CARD: "ACTIVE_DRAP_ITEM_TYPE_CARD",
+};
 
 function BoardContent({ board }) {
   // Sensors are used to handle drag and drop interactions in 10px, fix ficking the distance call an event
@@ -33,11 +41,26 @@ function BoardContent({ board }) {
   const mySensors = useSensors(mouseSensor, touchSensor);
 
   const [orderedColumns, setOrderedColumns] = useState([]);
+  const [activeDragItemId, setActiveDragItemId] = useState(null);
+  const [activeDragItemType, setActiveDragItemType] = useState(null);
+  const [activeDragItemData, setActiveDragItemData] = useState(null);
 
   useEffect(() => {
     setOrderedColumns(mapOrder(board?.columns, board?.columnOrderIds, "_id"));
   }, [board]);
 
+  // This function is called when the drag operation starts
+  const handleDragStart = (event) => {
+    setActiveDragItemId(event?.active?.id);
+    setActiveDragItemType(
+      event?.active?.data?.current?.columnId
+        ? ACTIVE_DRAP_ITEM_TYPE.CARD
+        : ACTIVE_DRAP_ITEM_TYPE.COLUMN
+    );
+    setActiveDragItemData(event?.active?.data?.current);
+  };
+
+  // This function is called when the drag operation ends
   const handleDragEnd = (event) => {
     console.log("Drag ended:", event);
     const { active, over } = event;
@@ -45,7 +68,7 @@ function BoardContent({ board }) {
     if (!active || !over) return;
 
     if (active.id !== over.id) {
-      // Same index means no change
+      // Same index but no changed
       const oldIndex = orderedColumns.findIndex((col) => col._id === active.id);
       // New index is where the item was dropped
       const newIndex = orderedColumns.findIndex((col) => col._id === over.id);
@@ -56,10 +79,22 @@ function BoardContent({ board }) {
       // console.log("Updated ordered columns:", dndOrderedColumns);
       // console.log("Updated ordered columns IDs:", dndOrderedColumnsIds);
     }
+    setActiveDragItemId(null);
+    setActiveDragItemType(null);
+    setActiveDragItemData(null);
   };
 
+  const customDropAnimation = {
+    sideEffects: defaultDropAnimationSideEffects({
+      styles: { active: { opacity: 0.5 } },
+    }),
+  };
   return (
-    <DndContext onDragEnd={handleDragEnd} sensors={mySensors}>
+    <DndContext
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      sensors={mySensors}
+    >
       <Box
         sx={{
           bgcolor: (theme) =>
@@ -70,6 +105,15 @@ function BoardContent({ board }) {
         }}
       >
         <ListColumns columns={orderedColumns} />
+        <DragOverlay dropAnimation={customDropAnimation}>
+          {!activeDragItemType && null}
+          {activeDragItemType === ACTIVE_DRAP_ITEM_TYPE.COLUMN && (
+            <Column column={activeDragItemData} />
+          )}
+          {activeDragItemType === ACTIVE_DRAP_ITEM_TYPE.CARD && (
+            <Card card={activeDragItemData} />
+          )}
+        </DragOverlay>
       </Box>
     </DndContext>
   );
