@@ -59,6 +59,78 @@ function BoardContent({ board }) {
     );
   };
 
+  // Update state when move card between different columns
+  const moveCardBetweenDifferentColumns = (
+    overColumn,
+    overCardId,
+    active,
+    over,
+    activeColumn,
+    activeDraggingCardId,
+    activeDraggingCardData
+  ) => {
+    setOrderedColumns((prevColumns) => {
+      //find the index of the active column
+      const overCardIndex = overColumn?.cards?.findIndex(
+        (card) => card._id === overCardId
+      );
+      let newCardIndex;
+      const isBeLowOverItem =
+        active.rect.current.translated &&
+        active.rect.current.translated.top > over.rect.top + over.rect.height;
+
+      const modifier = isBeLowOverItem ? 1 : 0;
+      newCardIndex =
+        overCardIndex >= 0
+          ? newCardIndex + modifier
+          : overColumn?.cards?.length + 1;
+      const nextColumns = cloneDeep(prevColumns);
+
+      const nextActiveColumn = nextColumns.find(
+        (col) => col._id === activeColumn._id
+      );
+      const nextOverColumn = nextColumns.find(
+        (col) => col._id === overColumn._id
+      );
+
+      // Remove the card from the active column
+      if (nextActiveColumn) {
+        nextActiveColumn.cards = nextActiveColumn.cards.filter(
+          (card) => card._id !== activeDraggingCardId
+        );
+        // Update the card order IDs in the active column
+        nextActiveColumn.cardOrderIds = nextActiveColumn.cards.map(
+          (card) => card._id
+        );
+      }
+
+      if (nextOverColumn) {
+        // Check card existence before adding
+        nextActiveColumn.cards = nextActiveColumn.cards.filter(
+          (card) => card._id !== activeDraggingCardId
+        );
+
+        // Update columnId in card data when move between columns
+        const rebuild_activeDraggingCardData = {
+          ...activeDraggingCardData,
+          columnId: nextOverColumn._id,
+        };
+
+        // Adding the card to the over column at the new index
+        nextOverColumn.cards = nextOverColumn.cards.toSpliced(
+          newCardIndex,
+          0,
+          rebuild_activeDraggingCardData
+        );
+        // Update the card order IDs in the over column
+        nextOverColumn.cardOrderIds = nextOverColumn.cards.map(
+          (card) => card._id
+        );
+      }
+      return nextColumns;
+    });
+  };
+
   // This function is called when the drag operation starts
   const handleDragStart = (event) => {
     setActiveDragItemId(event?.active?.id);
@@ -96,60 +168,15 @@ function BoardContent({ board }) {
     if (!activeColumn || !overColumn) return;
 
     if (activeColumn._id !== overColumn._id) {
-      setOrderedColumns((prevColumns) => {
-        //find the index of the active column
-        const overCardIndex = overColumn?.cards?.findIndex(
-          (card) => card._id === overCardId
-        );
-        let newCardIndex;
-        const isBeLowOverItem =
-          active.rect.current.translated &&
-          active.rect.current.translated.top > over.rect.top + over.rect.height;
-
-        const modifier = isBeLowOverItem ? 1 : 0;
-        newCardIndex =
-          overCardIndex >= 0
-            ? newCardIndex + modifier
-            : overColumn?.cards?.length + 1;
-        const nextColumns = cloneDeep(prevColumns);
-
-        const nextActiveColumn = nextColumns.find(
-          (col) => col._id === activeColumn._id
-        );
-        const nextOverColumn = nextColumns.find(
-          (col) => col._id === overColumn._id
-        );
-
-        // Remove the card from the active column
-        if (nextActiveColumn) {
-          nextActiveColumn.cards = nextActiveColumn.cards.filter(
-            (card) => card._id !== activeDraggingCardId
-          );
-          // Update the card order IDs in the active column
-          nextActiveColumn.cardOrderIds = nextActiveColumn.cards.map(
-            (card) => card._id
-          );
-        }
-
-        if (nextOverColumn) {
-          // Check card existence before adding
-          nextActiveColumn.cards = nextActiveColumn.cards.filter(
-            (card) => card._id !== activeDraggingCardId
-          );
-
-          // Adding the card to the over column at the new index
-          nextOverColumn.cards = nextOverColumn.cards.toSpliced(
-            newCardIndex,
-            0,
-            activeDraggingCardData
-          );
-          // Update the card order IDs in the over column
-          nextOverColumn.cardOrderIds = nextOverColumn.cards.map(
-            (card) => card._id
-          );
-        }
-        return nextColumns;
-      });
+      moveCardBetweenDifferentColumns(
+        overColumn,
+        overCardId,
+        active,
+        over,
+        activeColumn,
+        activeDraggingCardId,
+        activeDraggingCardData
+      );
     }
   };
 
@@ -173,7 +200,15 @@ function BoardContent({ board }) {
       if (!activeColumn || !overColumn) return;
 
       if (prevColumnWhenDraggingCard._id !== overColumn._id) {
-        console.log("keo card giua 2 column khac nhau");
+        moveCardBetweenDifferentColumns(
+          overColumn,
+          overCardId,
+          active,
+          over,
+          activeColumn,
+          activeDraggingCardId,
+          activeDraggingCardData
+        );
       } else {
         // Get an old postion from prevColumnWhenDraggingCard
         const oldCardIndex = prevColumnWhenDraggingCard?.card?.findIndex(
