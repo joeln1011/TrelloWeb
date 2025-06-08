@@ -14,9 +14,7 @@ import {
   closestCorners,
   defaultDropAnimationSideEffects,
   pointerWithin,
-  rectIntersection,
   getFirstCollision,
-  closestCenter,
 } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import Column from "./ListColumns/Column/Column";
@@ -287,17 +285,15 @@ function BoardContent({ board }) {
       // Find all the pointers within the container
       const pointerIntersections = pointerWithin(args);
 
-      //
-      const interactions = !!pointerIntersections?.length
-        ? pointerIntersections
-        : rectIntersection(args);
+      // If there are no pointer intersections at all, return empty array
+      if (!pointerIntersections?.length) return;
 
-      // Return the first collision
-      let overId = getFirstCollision(interactions, "id");
+      // Find the first overId of pointerIntersections
+      let overId = getFirstCollision(pointerIntersections, "id");
       if (overId) {
         const checkColumn = orderedColumns.find((col) => col._id === overId);
         if (checkColumn) {
-          overId = closestCenter({
+          overId = closestCorners({
             ...args,
             droppableContainers: args.droppableContainers.filter(
               (container) => {
