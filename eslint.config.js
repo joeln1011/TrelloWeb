@@ -34,6 +34,7 @@ export default [
           patterns: [{ regex: "^@mui/[^/]+$" }],
         },
       ],
+      "no-extra-boolean-cast": "off",
     },
   },
 ];
