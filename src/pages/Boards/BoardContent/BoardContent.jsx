@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import ListColumns from "./ListColumns/ListColumns";
 
 import { mapOrder } from "~/utils/sorts";
-import { cloneDeep, over } from "lodash";
+import { cloneDeep, isEmpty } from "lodash";
 import {
   DndContext,
   DragOverlay,
@@ -19,6 +19,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 import Column from "./ListColumns/Column/Column";
 import Card from "./ListColumns/Column/ListCards/Card/Card";
+import { generatePlaceholderCard } from "~/utils/formatter";
 
 const ACTIVE_DRAP_ITEM_TYPE = {
   COLUMN: "ACTIVE_DRAP_ITEM_TYPE_COLUMN",
@@ -107,6 +108,11 @@ function BoardContent({ board }) {
         );
       }
 
+      // Add plaveholder card if the active column is empty after removing the card
+      if (isEmpty(nextActiveColumn.cards)) {
+        nextActiveColumn.cards = [generatePlaceholderCard(nextActiveColumn)];
+      }
+
       if (nextOverColumn) {
         // Check card existence before adding
         nextActiveColumn.cards = nextActiveColumn.cards.filter(
@@ -125,11 +131,18 @@ function BoardContent({ board }) {
           0,
           rebuild_activeDraggingCardData
         );
+
+        // Remove placeholder card if exists
+        nextOverColumn.cards = nextOverColumn.cards.filter(
+          (card) => !card.FE_PlaceholderCard
+        );
+
         // Update the card order IDs in the over column
         nextOverColumn.cardOrderIds = nextOverColumn.cards.map(
           (card) => card._id
         );
       }
+
       return nextColumns;
     });
   };
