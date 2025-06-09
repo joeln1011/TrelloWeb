@@ -102,15 +102,16 @@ function BoardContent({ board }) {
         nextActiveColumn.cards = nextActiveColumn.cards.filter(
           (card) => card._id !== activeDraggingCardId
         );
+
+        // Add plaveholder card if the active column is empty after removing the card
+        if (isEmpty(nextActiveColumn.cards)) {
+          nextActiveColumn.cards = [generatePlaceholderCard(nextActiveColumn)];
+        }
+
         // Update the card order IDs in the active column
         nextActiveColumn.cardOrderIds = nextActiveColumn.cards.map(
           (card) => card._id
         );
-      }
-
-      // Add plaveholder card if the active column is empty after removing the card
-      if (isEmpty(nextActiveColumn.cards)) {
-        nextActiveColumn.cards = [generatePlaceholderCard(nextActiveColumn)];
       }
 
       if (nextOverColumn) {
@@ -142,7 +143,7 @@ function BoardContent({ board }) {
           (card) => card._id
         );
       }
-
+      console.log("nextColumns", nextColumns);
       return nextColumns;
     });
   };
