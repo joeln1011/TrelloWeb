@@ -7,8 +7,6 @@ import { cloneDeep, isEmpty } from "lodash";
 import {
   DndContext,
   DragOverlay,
-  MouseSensor,
-  TouchSensor,
   useSensor,
   useSensors,
   closestCorners,
@@ -16,6 +14,7 @@ import {
   pointerWithin,
   getFirstCollision,
 } from "@dnd-kit/core";
+import { MouseSensor, TouchSensor } from "~/customLibs/DndKitSensors";
 import { arrayMove } from "@dnd-kit/sortable";
 import Column from "./ListColumns/Column/Column";
 import Card from "./ListColumns/Column/ListCards/Card/Card";
