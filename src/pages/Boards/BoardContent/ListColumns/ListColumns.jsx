@@ -5,7 +5,7 @@ import NoteAdd from "@mui/icons-material/NoteAdd";
 import Column from "./Column/Column";
 import TextField from "@mui/material/TextField";
 import CloseIcon from "@mui/icons-material/Close";
-
+import { toast } from "react-toastify";
 import {
   SortableContext,
   horizontalListSortingStrategy,
@@ -20,7 +20,7 @@ function ListColumns({ columns }) {
   };
   const addNewColumn = () => {
     if (!newColumnTitle) {
-      // console.error("Please Enter Column Title");
+      toast.error("Please Enter Column Title");
       return;
     }
     // console.log({ newColumnTitle });
