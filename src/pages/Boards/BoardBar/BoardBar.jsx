@@ -13,7 +13,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 
-import { capitalizeFirstLetter } from "~/utils/formatter";
+import { capitalizeFirstLetter } from "~/utils/formatters";
 
 const MENU_STYLES = {
   color: "white",

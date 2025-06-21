@@ -18,18 +18,15 @@ import { MouseSensor, TouchSensor } from "~/customLibs/DndKitSensors";
 import { arrayMove } from "@dnd-kit/sortable";
 import Column from "./ListColumns/Column/Column";
 import Card from "./ListColumns/Column/ListCards/Card/Card";
-import { generatePlaceholderCard } from "~/utils/formatter";
+import { generatePlaceholderCard } from "~/utils/formatters";
 
 const ACTIVE_DRAP_ITEM_TYPE = {
   COLUMN: "ACTIVE_DRAP_ITEM_TYPE_COLUMN",
   CARD: "ACTIVE_DRAP_ITEM_TYPE_CARD",
 };
 
-function BoardContent({ board }) {
+function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
   // Sensors are used to handle drag and drop interactions in 10px, fix ficking the distance call an event
-  // const pointerSensor = useSensor(PointerSensor, {
-  //   activationConstraint: { distance: 10 },
-  // });
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: { distance: 10 },
   });
@@ -256,26 +253,27 @@ function BoardContent({ board }) {
         });
       }
     }
+    // Active if drag and drop a column
+    if (activeDragItemType === ACTIVE_DRAP_ITEM_TYPE.COLUMN) {
+      if (active.id !== over.id) {
+        // If same index it wont be changed
+        const oldColumnIndex = orderedColumns.findIndex(
+          (col) => col._id === active.id
+        );
+        // New index is where the item was dropped
+        const newColumnIndex = orderedColumns.findIndex(
+          (col) => col._id === over.id
+        );
 
-    if (
-      activeDragItemType === ACTIVE_DRAP_ITEM_TYPE.COLUMNM &&
-      active.id !== over.id
-    ) {
-      // If same index it wont be changed
-      const oldColumnIndex = orderedColumns.findIndex(
-        (col) => col._id === active.id
-      );
-      // New index is where the item was dropped
-      const newColumnIndex = orderedColumns.findIndex(
-        (col) => col._id === over.id
-      );
-
-      const dndOrderedColumns = arrayMove(
-        orderedColumns,
-        oldColumnIndex,
-        newColumnIndex
-      );
-      setOrderedColumns(dndOrderedColumns);
+        const dndOrderedColumns = arrayMove(
+          orderedColumns,
+          oldColumnIndex,
+          newColumnIndex
+        );
+        moveColumns(dndOrderedColumns);
+        // Avoid delay or flicking when dragging a column in API
+        setOrderedColumns(dndOrderedColumns);
+      }
     }
 
     setActiveDragItemId(null);
@@ -325,7 +323,7 @@ function BoardContent({ board }) {
       return lastOverId.current ? [{ id: lastOverId.current }] : [];
     },
 
-    [activeDragItemType]
+    [activeDragItemType, orderedColumns]
   );
 
   return (
@@ -346,14 +344,18 @@ function BoardContent({ board }) {
           p: "10px 0",
         }}
       >
-        <ListColumns columns={orderedColumns} />
+        <ListColumns
+          columns={orderedColumns}
+          createNewColumn={createNewColumn}
+          createNewCard={createNewCard}
+        />
         <DragOverlay dropAnimation={customDropAnimation}>
           {!activeDragItemType && null}
           {activeDragItemType === ACTIVE_DRAP_ITEM_TYPE.COLUMN && (
             <Column column={activeDragItemData} />
           )}
           {activeDragItemType === ACTIVE_DRAP_ITEM_TYPE.CARD && (
-            <Card card={activeDragItemData} />
+            <Card card={activeDragItemData} createNewCard={createNewCard} />
           )}
         </DragOverlay>
       </Box>
