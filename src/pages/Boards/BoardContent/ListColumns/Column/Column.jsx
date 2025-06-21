@@ -27,7 +27,7 @@ import { toast } from "react-toastify";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-function Column({ column }) {
+function Column({ column, createNewCard }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => setAnchorEl(event.currentTarget);
@@ -41,14 +41,19 @@ function Column({ column }) {
   const toggleNewCardForm = () => {
     setOpenNewCardForm(!openNewCardForm);
   };
-  const addNewCard = () => {
+  const addNewCard = async () => {
     if (!newCardTitle) {
       toast.error("Please Enter Card Title", { position: "bottom-right" });
       return;
     }
-    // console.log({ newCardTitle });
 
-    //Call API here....
+    // Create new card data to call API
+    const newCardData = {
+      title: newCardTitle,
+      columnId: column._id,
+    };
+    await createNewCard(newCardData);
+
     toggleNewCardForm();
     setNewCardTitle("");
   };

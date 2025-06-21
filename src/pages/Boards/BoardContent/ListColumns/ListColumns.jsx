@@ -11,21 +11,24 @@ import {
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-function ListColumns({ columns }) {
+function ListColumns({ columns, createNewColumn, createNewCard }) {
   const [openNewColumnForm, setOpenNewColumnForm] = useState();
   const [newColumnTitle, setNewColumnTitle] = useState("");
 
   const toggleNewColumnForm = () => {
     setOpenNewColumnForm(!openNewColumnForm);
   };
-  const addNewColumn = () => {
+  const addNewColumn = async () => {
     if (!newColumnTitle) {
       toast.error("Please Enter Column Title");
       return;
     }
-    // console.log({ newColumnTitle });
 
-    //Call API here....
+    const newColumnData = {
+      title: newColumnTitle,
+    };
+    await createNewColumn(newColumnData);
+
     toggleNewColumnForm();
     setNewColumnTitle("");
   };
@@ -48,7 +51,11 @@ function ListColumns({ columns }) {
       >
         {/* Column */}
         {columns?.map((column) => (
-          <Column key={column._id} column={column} />
+          <Column
+            key={column._id}
+            column={column}
+            createNewCard={createNewCard}
+          />
         ))}
 
         {/* Box add new column */}
