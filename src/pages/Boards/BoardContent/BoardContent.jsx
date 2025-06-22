@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import ListColumns from "./ListColumns/ListColumns";
 
-import { mapOrder } from "~/utils/sorts";
 import { cloneDeep, isEmpty } from "lodash";
 import {
   DndContext,
@@ -25,7 +24,13 @@ const ACTIVE_DRAP_ITEM_TYPE = {
   CARD: "ACTIVE_DRAP_ITEM_TYPE_CARD",
 };
 
-function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
+function BoardContent({
+  board,
+  createNewColumn,
+  createNewCard,
+  moveColumns,
+  moveCardSameColumn,
+}) {
   // Sensors are used to handle drag and drop interactions in 10px, fix ficking the distance call an event
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: { distance: 10 },
@@ -44,12 +49,12 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
   const [activeDragItemId, setActiveDragItemId] = useState(null);
   const [activeDragItemType, setActiveDragItemType] = useState(null);
   const [activeDragItemData, setActiveDragItemData] = useState(null);
-  const [prevColumnWhenDraggingCard, setPrevColumnWhenDraggingCard] =
+  const [oldColumnWhenDraggingCard, setPrevColumnWhenDraggingCard] =
     useState(null);
   const lastOverId = useRef(null);
 
   useEffect(() => {
-    setOrderedColumns(mapOrder(board?.columns, board?.columnOrderIds, "_id"));
+    setOrderedColumns(board.columns);
   }, [board]);
 
   //Find Column by CardId
@@ -139,7 +144,6 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
           (card) => card._id
         );
       }
-      console.log("nextColumns", nextColumns);
       return nextColumns;
     });
   };
@@ -212,7 +216,7 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
       // Trigger when dragging a card over a different column,if same column do nothing
       if (!activeColumn || !overColumn) return;
 
-      if (prevColumnWhenDraggingCard._id !== overColumn._id) {
+      if (oldColumnWhenDraggingCard._id !== overColumn._id) {
         moveCardBetweenDifferentColumns(
           overColumn,
           overCardId,
@@ -223,19 +227,28 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
           activeDraggingCardData
         );
       } else {
-        // Get an old postion from prevColumnWhenDraggingCard
-        const oldCardIndex = prevColumnWhenDraggingCard?.card?.findIndex(
+        // Dragging a card within the same column
+
+        // Get an old postion from oldColumnWhenDraggingCard
+        const oldCardIndex = oldColumnWhenDraggingCard?.cards?.findIndex(
           (col) => col._id === activeDragItemId
         );
+
         // Get a new position from overColumn
         const newCardIndex = overColumn?.cards?.findIndex(
           (col) => col._id === overCardId
         );
+        // If the card is dropped in the same position, do nothing
+        if (oldCardIndex === newCardIndex) return;
+
         const dndOrderedCards = arrayMove(
-          prevColumnWhenDraggingCard?.cards,
+          oldColumnWhenDraggingCard?.cards,
           oldCardIndex,
           newCardIndex
         );
+        const dndOrderedCardIds = dndOrderedCards.map((card) => card._id);
+
+        // Avoid delay and flickering when waiting for API response
         setOrderedColumns((prevColumns) => {
           // Clone previous columns to avoid direct state mutation
           const nextColumns = cloneDeep(prevColumns);
@@ -247,10 +260,15 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
 
           // Update the column with the reordered cards
           targetColumn.cards = dndOrderedCards;
-          targetColumn.cardOrderIds = dndOrderedCards.map((card) => card._id);
+          targetColumn.cardOrderIds = dndOrderedCardIds;
           // Return the updated columns
           return nextColumns;
         });
+        moveCardSameColumn(
+          dndOrderedCards,
+          dndOrderedCardIds,
+          oldColumnWhenDraggingCard._id
+        );
       }
     }
     // Active if drag and drop a column
@@ -270,9 +288,10 @@ function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
           oldColumnIndex,
           newColumnIndex
         );
-        moveColumns(dndOrderedColumns);
         // Avoid delay or flicking when dragging a column in API
         setOrderedColumns(dndOrderedColumns);
+
+        moveColumns(dndOrderedColumns);
       }
     }
 
