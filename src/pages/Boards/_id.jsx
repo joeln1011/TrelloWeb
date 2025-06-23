@@ -73,9 +73,15 @@ function Board() {
       (column) => column._id === newCardData.columnId
     );
     if (columnToUpdate) {
-      columnToUpdate.cards.push(createdCard);
-      columnToUpdate.cardOrderIds.push(createdCard._id);
+      if (columnToUpdate.cards.some((card) => card.FE_PlaceholderCard)) {
+        columnToUpdate.cards = [createdCard];
+        columnToUpdate.cardOrderIds = [createdCard._id];
+      } else {
+        columnToUpdate.cards.push(createdCard);
+        columnToUpdate.cardOrderIds.push(createdCard._id);
+      }
     }
+
     setBoard(newBoard);
   };
 
@@ -100,10 +106,9 @@ function Board() {
     const columnToUpdate = newBoard.columns.find(
       (column) => column._id === columnId
     );
-    if (columnToUpdate) {
-      columnToUpdate.cards = dndOrderedCards;
-      columnToUpdate.cardOrderIds = dndOrderedCardIds;
-    }
+    columnToUpdate.cards = dndOrderedCards;
+    columnToUpdate.cardOrderIds = dndOrderedCardIds;
+
     setBoard(newBoard);
 
     //Call API to update the column with new card order
@@ -125,12 +130,16 @@ function Board() {
     setBoard(newBoard);
 
     // Call API to update the board with new column order
+    let prevCardOrderIds =
+      dndOrderedColumns.find((col) => col._id === prevColumnId)?.cardOrderIds ||
+      [];
+    // Hande case when dragging a last card from a column, column will has a placeholder card and delete it before send to BE
+    if (prevCardOrderIds[0].includes("placeholder-card")) prevCardOrderIds = [];
+
     moveCardToDifferentColumnAPI({
       currentCardId,
       prevColumnId,
-      prevCardOrderIds: dndOrderedColumns.find(
-        (col) => col._id === prevColumnId
-      )?.cardOrderIds,
+      prevCardOrderIds,
       nextColumnId,
       nextCardOrderIds: dndOrderedColumns.find(
         (col) => col._id === nextColumnId
