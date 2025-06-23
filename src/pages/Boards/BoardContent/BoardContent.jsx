@@ -30,6 +30,7 @@ function BoardContent({
   createNewCard,
   moveColumns,
   moveCardSameColumn,
+  moveCardToDifferentColumn,
 }) {
   // Sensors are used to handle drag and drop interactions in 10px, fix ficking the distance call an event
   const mouseSensor = useSensor(MouseSensor, {
@@ -72,7 +73,8 @@ function BoardContent({
     over,
     activeColumn,
     activeDraggingCardId,
-    activeDraggingCardData
+    activeDraggingCardData,
+    triggerFrom
   ) => {
     setOrderedColumns((prevColumns) => {
       //find the index of the active column
@@ -144,6 +146,16 @@ function BoardContent({
           (card) => card._id
         );
       }
+
+      if (triggerFrom === "handleDragOver") {
+        moveCardToDifferentColumn(
+          activeDraggingCardId,
+          oldColumnWhenDraggingCard._id,
+          nextOverColumn._id,
+          nextColumns
+        );
+      }
+
       return nextColumns;
     });
   };
@@ -192,7 +204,8 @@ function BoardContent({
         over,
         activeColumn,
         activeDraggingCardId,
-        activeDraggingCardData
+        activeDraggingCardData,
+        "handleDragOver"
       );
     }
   };
@@ -224,11 +237,11 @@ function BoardContent({
           over,
           activeColumn,
           activeDraggingCardId,
-          activeDraggingCardData
+          activeDraggingCardData,
+          "handleDragEnd"
         );
       } else {
         // Dragging a card within the same column
-
         // Get an old postion from oldColumnWhenDraggingCard
         const oldCardIndex = oldColumnWhenDraggingCard?.cards?.findIndex(
           (col) => col._id === activeDragItemId
