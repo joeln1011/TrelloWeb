@@ -3,10 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "author": "Joel Nguyen",
+  "engines": {
+    "node": ">=18.x"
+  },
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
-    "lint": "eslint .",
+    "build": "vite build --base=./",
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "dependencies": {
