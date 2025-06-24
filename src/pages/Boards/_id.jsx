@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-//import { mockData } from "~/apis/mock-data";
-//import { useParams } from "react-router-dom";
 import { mapOrder } from "~/utils/sorts";
+import { toast } from "react-toastify";
 
 import {
   fetchBoardDetailsAPI,
@@ -10,6 +9,7 @@ import {
   updateBoardDetailsAPI,
   updateColumnDetailsAPI,
   moveCardToDifferentColumnAPI,
+  deleteColumnDetailsAPI,
 } from "~/apis";
 
 import { generatePlaceholderCard } from "~/utils/formatters";
@@ -146,6 +146,19 @@ function Board() {
       )?.cardOrderIds,
     });
   };
+  const deleteColumnDetails = (columnId) => {
+    // Update data in the board state correctly
+    const newBoard = { ...board };
+    newBoard.columns = newBoard.columns.filter((col) => col._id !== columnId);
+    newBoard.columnOrderIds = newBoard.columnOrderIds.filter(
+      (_id) => _id !== columnId
+    );
+    setBoard(newBoard);
+    // Call Api handle delete column
+    deleteColumnDetailsAPI(columnId).then((res) => {
+      toast.success(res?.deleteResult);
+    });
+  };
 
   if (!board) {
     return (
@@ -176,6 +189,7 @@ function Board() {
         moveColumns={moveColumns}
         moveCardSameColumn={moveCardSameColumn}
         moveCardToDifferentColumn={moveCardToDifferentColumn}
+        deleteColumnDetails={deleteColumnDetails}
       />
     </Container>
   );

@@ -31,6 +31,7 @@ function BoardContent({
   moveColumns,
   moveCardSameColumn,
   moveCardToDifferentColumn,
+  deleteColumnDetails,
 }) {
   // Sensors are used to handle drag and drop interactions in 10px, fix ficking the distance call an event
   const mouseSensor = useSensor(MouseSensor, {
@@ -380,6 +381,7 @@ function BoardContent({
           columns={orderedColumns}
           createNewColumn={createNewColumn}
           createNewCard={createNewCard}
+          deleteColumnDetails={deleteColumnDetails}
         />
         <DragOverlay dropAnimation={customDropAnimation}>
           {!activeDragItemType && null}

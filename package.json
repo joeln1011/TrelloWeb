@@ -20,6 +20,7 @@
     "@mui/styled-engine-sc": "^7.1.0",
     "axios": "^1.10.0",
     "lodash": "^4.17.21",
+    "material-ui-confirm": "^4.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^7.6.2",
