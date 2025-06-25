@@ -1,12 +1,11 @@
 let apiRoot = "";
-const buildMode = import.meta.env?.BUILD_MODE || "dev";
-
-if (buildMode === "dev") {
+// eslint-disable-next-line no-undef
+if (process.env.BUILD_MODE === "dev") {
   apiRoot = "http://localhost:8017";
 }
-if (buildMode === "production") {
+// eslint-disable-next-line no-undef
+if (process.env.BUILD_MODE === "production") {
   apiRoot = "https://trelloapi-512x.onrender.com";
 }
 
 export const API_ROOT = apiRoot;
-  
