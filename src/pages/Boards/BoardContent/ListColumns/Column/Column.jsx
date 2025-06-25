@@ -22,12 +22,22 @@ import TextField from "@mui/material/TextField";
 import CloseIcon from "@mui/icons-material/Close";
 import ListCards from "./ListCards/ListCards";
 
+import { cloneDeep } from "lodash";
 import { toast } from "react-toastify";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useConfirm } from "material-ui-confirm";
+import {
+  selectCurrentActiveBoard,
+  updateCurrentActiveBoard,
+} from "~/redux/activeBoard/activeBoardSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { createNewCardAPI, deleteColumnDetailsAPI } from "~/apis";
 
-function Column({ column, createNewCard, deleteColumnDetails }) {
+function Column({ column }) {
+  const dispatch = useDispatch();
+  const board = useSelector(selectCurrentActiveBoard);
+
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => setAnchorEl(event.currentTarget);
@@ -41,7 +51,7 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
   const toggleNewCardForm = () => {
     setOpenNewCardForm(!openNewCardForm);
   };
-  const addNewCard = () => {
+  const addNewCard = async () => {
     if (!newCardTitle) {
       toast.error("Please Enter Card Title", { position: "bottom-right" });
       return;
@@ -52,7 +62,26 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
       title: newCardTitle,
       columnId: column._id,
     };
-    createNewCard(newCardData);
+    // Call an API to create a new card
+    const createdCard = await createNewCardAPI({
+      ...newCardData,
+      boardId: board._id,
+    });
+    const newBoard = cloneDeep(board);
+    const columnToUpdate = newBoard.columns.find(
+      (column) => column._id === newCardData.columnId
+    );
+    if (columnToUpdate) {
+      if (columnToUpdate.cards.some((card) => card.FE_PlaceholderCard)) {
+        columnToUpdate.cards = [createdCard];
+        columnToUpdate.cardOrderIds = [createdCard._id];
+      } else {
+        columnToUpdate.cards.push(createdCard);
+        columnToUpdate.cardOrderIds.push(createdCard._id);
+      }
+    }
+
+    dispatch(updateCurrentActiveBoard(newBoard));
 
     toggleNewCardForm();
     setNewCardTitle("");
@@ -85,7 +114,19 @@ function Column({ column, createNewCard, deleteColumnDetails }) {
       cancellationText: "Cancel",
     });
     if (confirmed) {
-      deleteColumnDetails(column._id);
+      // Update data in the board state correctly
+      const newBoard = { ...board };
+      newBoard.columns = newBoard.columns.filter(
+        (col) => col._id !== column._id
+      );
+      newBoard.columnOrderIds = newBoard.columnOrderIds.filter(
+        (_id) => _id !== column._id
+      );
+      dispatch(updateCurrentActiveBoard(newBoard));
+      // Call Api handle delete column
+      deleteColumnDetailsAPI(column._id).then((res) => {
+        toast.success(res?.deleteResult);
+      });
     } else if (reason) {
       toast.error(`Delete cancelled: ${reason}`, {
         position: "bottom-right",
