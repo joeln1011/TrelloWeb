@@ -26,12 +26,9 @@ const ACTIVE_DRAP_ITEM_TYPE = {
 
 function BoardContent({
   board,
-  createNewColumn,
-  createNewCard,
   moveColumns,
   moveCardSameColumn,
   moveCardToDifferentColumn,
-  deleteColumnDetails,
 }) {
   // Sensors are used to handle drag and drop interactions in 10px, fix ficking the distance call an event
   const mouseSensor = useSensor(MouseSensor, {
@@ -377,19 +374,14 @@ function BoardContent({
           p: "10px 0",
         }}
       >
-        <ListColumns
-          columns={orderedColumns}
-          createNewColumn={createNewColumn}
-          createNewCard={createNewCard}
-          deleteColumnDetails={deleteColumnDetails}
-        />
+        <ListColumns columns={orderedColumns} />
         <DragOverlay dropAnimation={customDropAnimation}>
           {!activeDragItemType && null}
           {activeDragItemType === ACTIVE_DRAP_ITEM_TYPE.COLUMN && (
             <Column column={activeDragItemData} />
           )}
           {activeDragItemType === ACTIVE_DRAP_ITEM_TYPE.CARD && (
-            <Card card={activeDragItemData} createNewCard={createNewCard} />
+            <Card card={activeDragItemData} />
           )}
         </DragOverlay>
       </Box>
