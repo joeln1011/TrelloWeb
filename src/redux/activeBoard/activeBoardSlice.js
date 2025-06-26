@@ -30,7 +30,8 @@ export const activeBoardSlice = createSlice({
       state.currentActiveBoard = board;
     },
   },
-  // The `extraReducers` field lets us define additional reducers
+
+  //
   extraReducers: (builder) => {
     builder.addCase(fetchBoardDetailsAPI.fulfilled, (state, action) => {
       // action.payload is response.data reuturned from the API
