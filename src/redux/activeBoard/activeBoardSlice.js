@@ -1,4 +1,4 @@
-import axios from "axios";
+import authorizeAxiosInstance from "~/utils/authorizeAxios";
 import { mapOrder } from "~/utils/sorts";
 import { generatePlaceholderCard } from "~/utils/formatters";
 import { isEmpty } from "lodash";
@@ -12,7 +12,9 @@ const initialState = {
 export const fetchBoardDetailsAPI = createAsyncThunk(
   "activeBoard/fetchBoardDetailAPI",
   async (boardId) => {
-    const response = await axios.get(`${API_ROOT}/v1/boards/${boardId}`);
+    const response = await authorizeAxiosInstance.get(
+      `${API_ROOT}/v1/boards/${boardId}`
+    );
     return response.data;
   }
 );
