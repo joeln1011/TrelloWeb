@@ -7,11 +7,14 @@ import CardActions from '@mui/material/CardActions';
 import TextField from '@mui/material/TextField';
 import Zoom from '@mui/material/Zoom';
 import Alert from '@mui/material/Alert';
-
 import Card from '@mui/material/Card';
+
 import { ReactComponent as TrelloIcon } from '~/assets/trello.svg';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { loginUserAPI } from '~/redux/user/userSlice';
+import { toast } from 'react-toastify';
 import FieldErrorAlert from '~/components/Form/FieldErrorAlert';
 import {
   EMAIL_RULE,
@@ -22,6 +25,8 @@ import {
 } from '~/utils/validator';
 
 const LoginForm = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -31,11 +36,21 @@ const LoginForm = () => {
   const registeredEmail = searchParams.get('registeredEmail');
   const verifiedEmail = searchParams.get('verifiedEmail');
 
-  const submitLogin = (data) => {
-    console.log('Login data submitted:', data);
+  const submitLogIn = (data) => {
+    const { email, password } = data;
+    toast
+      .promise(dispatch(loginUserAPI({ email, password })), {
+        pending: 'Logging...',
+      })
+      .then((res) => {
+        // If login is successful, redirect to the home page
+        if (!res.error) {
+          navigate('/');
+        }
+      });
   };
   return (
-    <form onSubmit={handleSubmit(submitLogin)}>
+    <form onSubmit={handleSubmit(submitLogIn)}>
       <Zoom in={true} style={{ transitionDelay: '200ms' }}>
         <Card sx={{ minWidth: 380, maxWidth: 400, marginTop: '6em' }}>
           <Box

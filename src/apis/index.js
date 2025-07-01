@@ -57,6 +57,7 @@ export const createNewCardAPI = async (newCardData) => {
 };
 
 /** Users */
+
 export const registerUserAPI = async (data) => {
   const response = await authorizeAxiosInstance.post(
     `${API_ROOT}/v1/users/register`,
@@ -72,7 +73,7 @@ export const registerUserAPI = async (data) => {
 };
 
 export const verifyUserAPI = async (data) => {
-  const response = await authorizeAxiosInstance.post(
+  const response = await authorizeAxiosInstance.put(
     `${API_ROOT}/v1/users/verify`,
     data
   );
