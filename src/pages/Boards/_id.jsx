@@ -1,26 +1,24 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 import {
   updateBoardDetailsAPI,
   updateColumnDetailsAPI,
   moveCardToDifferentColumnAPI,
-} from "~/apis";
+} from '~/apis';
 
-import { cloneDeep } from "lodash";
-import Container from "@mui/material/Container";
-import AppBar from "~/components/AppBar/AppBar";
-import BoardBar from "./BoardBar/BoardBar";
-import BoardContent from "./BoardContent/BoardContent";
-import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
-import Typography from "@mui/material/Typography";
+import { cloneDeep } from 'lodash';
+import Container from '@mui/material/Container';
+import AppBar from '~/components/AppBar/AppBar';
+import BoardBar from './BoardBar/BoardBar';
+import BoardContent from './BoardContent/BoardContent';
+import PageLoadingSpinner from '~/components/Loading/PageLoadingSpinner';
 import {
   fetchBoardDetailsAPI,
   updateCurrentActiveBoard,
   selectCurrentActiveBoard,
-} from "~/redux/activeBoard/activeBoardSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+} from '~/redux/activeBoard/activeBoardSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 
 function Board() {
   const dispatch = useDispatch();
@@ -80,7 +78,7 @@ function Board() {
       dndOrderedColumns.find((col) => col._id === prevColumnId)?.cardOrderIds ||
       [];
     // Hande case when dragging a last card from a column, column will has a placeholder card and delete it before send to BE
-    if (prevCardOrderIds[0].includes("placeholder-card")) prevCardOrderIds = [];
+    if (prevCardOrderIds[0].includes('placeholder-card')) prevCardOrderIds = [];
 
     moveCardToDifferentColumnAPI({
       currentCardId,
@@ -94,25 +92,11 @@ function Board() {
   };
 
   if (!board) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 2,
-          width: "100vw",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress />
-        <Typography variant="h6">Loading Board...</Typography>
-      </Box>
-    );
+    return <PageLoadingSpinner caption="Loading Board..." />;
   }
 
   return (
-    <Container disableGutters maxWidth={false} sx={{ height: "100vh" }}>
+    <Container disableGutters maxWidth={false} sx={{ height: '100vh' }}>
       <AppBar />
       <BoardBar board={board} />
       <BoardContent

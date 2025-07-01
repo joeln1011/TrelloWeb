@@ -1,25 +1,25 @@
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Avatar from "@mui/material/Avatar";
-import Lock from "@mui/icons-material/Lock";
-import CardActions from "@mui/material/CardActions";
-import TextField from "@mui/material/TextField";
-import Zoom from "@mui/material/Zoom";
-import Alert from "@mui/material/Alert";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Avatar from '@mui/material/Avatar';
+import Lock from '@mui/icons-material/Lock';
+import CardActions from '@mui/material/CardActions';
+import TextField from '@mui/material/TextField';
+import Zoom from '@mui/material/Zoom';
+import Alert from '@mui/material/Alert';
 
-import Card from "@mui/material/Card";
-import { ReactComponent as TrelloIcon } from "~/assets/trello.svg";
-import { Link } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import FieldErrorAlert from "~/components/Form/FieldErrorAlert";
+import Card from '@mui/material/Card';
+import { ReactComponent as TrelloIcon } from '~/assets/trello.svg';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import FieldErrorAlert from '~/components/Form/FieldErrorAlert';
 import {
   EMAIL_RULE,
   PASSWORD_RULE,
   FIELD_REQUIRED_MESSAGE,
   PASSWORD_RULE_MESSAGE,
   EMAIL_RULE_MESSAGE,
-} from "~/utils/validator";
+} from '~/utils/validator';
 
 const LoginForm = () => {
   const {
@@ -27,33 +27,37 @@ const LoginForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  let [searchParams] = useSearchParams();
+  const registeredEmail = searchParams.get('registeredEmail');
+  const verifiedEmail = searchParams.get('verifiedEmail');
+
   const submitLogin = (data) => {
-    console.log("Login data submitted:", data);
+    console.log('Login data submitted:', data);
   };
   return (
     <form onSubmit={handleSubmit(submitLogin)}>
-      <Zoom in={true} style={{ transitionDelay: "200ms" }}>
-        <Card sx={{ minWidth: 380, maxWidth: 400, marginTop: "6em" }}>
+      <Zoom in={true} style={{ transitionDelay: '200ms' }}>
+        <Card sx={{ minWidth: 380, maxWidth: 400, marginTop: '6em' }}>
           <Box
             sx={{
-              margin: "1em",
-              display: "flex",
-              justifyContent: "center",
+              margin: '1em',
+              display: 'flex',
+              justifyContent: 'center',
               gap: 1,
             }}
           >
-            <Avatar sx={{ bgcolor: "primary.main" }}>
+            <Avatar sx={{ bgcolor: 'primary.main' }}>
               <Lock />
             </Avatar>
-            <Avatar sx={{ bgcolor: "primary.main" }}>
+            <Avatar sx={{ bgcolor: 'primary.main' }}>
               <TrelloIcon />
             </Avatar>
           </Box>
           <Box
             sx={{
-              marginTop: "1em",
-              display: "flex",
-              justifyContent: "center",
+              marginTop: '1em',
+              display: 'flex',
+              justifyContent: 'center',
               color: (theme) => theme.palette.grey[500],
             }}
           >
@@ -61,59 +65,63 @@ const LoginForm = () => {
           </Box>
           <Box
             sx={{
-              marginTop: "1em",
-              display: "flex",
-              justifyContent: "center",
-              flexDirection: "column",
-              padding: "0 1em",
+              marginTop: '1em',
+              display: 'flex',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              padding: '0 1em',
             }}
           >
-            <Alert
-              severity="success"
-              sx={{ ".MuiAlert-message": { overflow: "hidden" } }}
-            >
-              Your email&nbsp;
-              <Typography
-                variant="span"
-                sx={{
-                  fontWeight: "bold",
-                  "&:hover": { color: "#FDBA26" },
-                }}
+            {verifiedEmail && (
+              <Alert
+                severity="success"
+                sx={{ '.MuiAlert-message': { overflow: 'hidden' } }}
               >
-                joelnt1011@gmail.com
-              </Typography>
-              &nbsp;has been verified successfully!
-              <br />
-              Now you can login to our services! Have a good day!
-            </Alert>
-            <Alert
-              severity="info"
-              sx={{ ".MuiAlert-message": { overflow: "hidden" } }}
-            >
-              An email has been sent to&nbsp;
-              <Typography
-                variant="span"
-                sx={{
-                  fontWeight: "bold",
-                  "&:hover": { color: "#FDBA26" },
-                }}
+                Your email&nbsp;
+                <Typography
+                  variant="span"
+                  sx={{
+                    fontWeight: 'bold',
+                    '&:hover': { color: '#FDBA26' },
+                  }}
+                >
+                  {verifiedEmail}
+                </Typography>
+                &nbsp;has been verified successfully!
+                <br />
+                Now you can login to our services! Have a good day!
+              </Alert>
+            )}
+            {registeredEmail && (
+              <Alert
+                severity="info"
+                sx={{ '.MuiAlert-message': { overflow: 'hidden' } }}
               >
-                joelnt1011@gmail.com
-              </Typography>
-              <br />
-              Please check and verify your email before logging in!
-            </Alert>
+                An email has been sent to&nbsp;
+                <Typography
+                  variant="span"
+                  sx={{
+                    fontWeight: 'bold',
+                    '&:hover': { color: '#FDBA26' },
+                  }}
+                >
+                  {registeredEmail}
+                </Typography>
+                <br />
+                Please check and verify your email before logging in!
+              </Alert>
+            )}
           </Box>
-          <Box sx={{ padding: "0 1em 1em 1em " }}>
-            <Box sx={{ marginTop: "1em" }}>
+          <Box sx={{ padding: '0 1em 1em 1em ' }}>
+            <Box sx={{ marginTop: '1em' }}>
               <TextField
                 autoFocus
                 fullWidth
                 label="Enter your email..."
                 type="text"
                 variant="outlined"
-                error={!!errors["email"]}
-                {...register("email", {
+                error={!!errors['email']}
+                {...register('email', {
                   required: FIELD_REQUIRED_MESSAGE,
                   pattern: {
                     value: EMAIL_RULE,
@@ -121,16 +129,16 @@ const LoginForm = () => {
                   },
                 })}
               />
-              <FieldErrorAlert errors={errors} fieldName={"email"} />
+              <FieldErrorAlert errors={errors} fieldName={'email'} />
             </Box>
-            <Box sx={{ marginTop: "1em" }}>
+            <Box sx={{ marginTop: '1em' }}>
               <TextField
                 fullWidth
                 label="Enter your password...."
                 type="password"
                 variant="outlined"
-                error={!!errors["password"]}
-                {...register("password", {
+                error={!!errors['password']}
+                {...register('password', {
                   required: FIELD_REQUIRED_MESSAGE,
                   pattern: {
                     value: PASSWORD_RULE,
@@ -138,10 +146,10 @@ const LoginForm = () => {
                   },
                 })}
               />
-              <FieldErrorAlert errors={errors} fieldName={"password"} />
+              <FieldErrorAlert errors={errors} fieldName={'password'} />
             </Box>
           </Box>
-          <CardActions sx={{ padding: "0 1em 1em 1em" }}>
+          <CardActions sx={{ padding: '0 1em 1em 1em' }}>
             <Button
               className="interceptor-loading"
               type="submit"
@@ -153,11 +161,11 @@ const LoginForm = () => {
               Login
             </Button>
           </CardActions>
-          <Box sx={{ padding: "0 1em 1em 1em", textAlign: "center" }}>
+          <Box sx={{ padding: '0 1em 1em 1em', textAlign: 'center' }}>
             <Typography>New to Trello MERN STACK?</Typography>
-            <Link to="/register" style={{ textDecoration: "none" }}>
+            <Link to="/register" style={{ textDecoration: 'none' }}>
               <Typography
-                sx={{ color: "primary.main", "&:hover:": { color: "#FFBB39" } }}
+                sx={{ color: 'primary.main', '&:hover:': { color: '#FFBB39' } }}
               >
                 Create an account!
               </Typography>

@@ -1,6 +1,6 @@
-import axios from "axios";
-import { toast } from "react-toastify";
-import { interceptorLoadingElements } from "~/utils/formatters";
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { interceptorLoadingElements } from '~/utils/formatters';
 let authorizeAxiosInstance = axios.create();
 
 // Maximum time for 1 request is 10 minutes

@@ -1,6 +1,6 @@
-import authorizeAxiosInstance from "~/utils/authorizeAxios";
-import { API_ROOT } from "~/utils/constants";
-
+import authorizeAxiosInstance from '~/utils/authorizeAxios';
+import { API_ROOT } from '~/utils/constants';
+import { toast } from 'react-toastify';
 /** Boards */
 // export const fetchBoardDetailsAPI = async (boardId) => {
 //   const response = await axios.get(`${API_ROOT}/v1/boards/${boardId}`);
@@ -53,5 +53,31 @@ export const createNewCardAPI = async (newCardData) => {
     `${API_ROOT}/v1/cards`,
     newCardData
   );
+  return response.data;
+};
+
+/** Users */
+export const registerUserAPI = async (data) => {
+  const response = await authorizeAxiosInstance.post(
+    `${API_ROOT}/v1/users/register`,
+    data
+  );
+  toast.success(
+    'Account created successfully! Please check your email to verify your account.',
+    {
+      theme: 'colored',
+    }
+  );
+  return response.data;
+};
+
+export const verifyUserAPI = async (data) => {
+  const response = await authorizeAxiosInstance.post(
+    `${API_ROOT}/v1/users/verify`,
+    data
+  );
+  toast.success('Account verified successfully! You can now login.', {
+    theme: 'colored',
+  });
   return response.data;
 };
