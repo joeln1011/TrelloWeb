@@ -27,16 +27,15 @@ const Profiles = () => {
   const dispatch = useDispatch();
   const currentUser = useSelector(selectCurrentUser);
   const confirmLogout = useConfirm();
-  const handdleLogout = () => {
-    confirmLogout({
+  const handdleLogout = async () => {
+    const { confirmed } = await confirmLogout({
       title: 'Are you sure you want to logout?',
       confirmationText: 'Confirm',
-      conformationText: 'Cancel',
-    })
-      .then(() => {
-        dispatch(logoutUserAPI());
-      })
-      .catch(() => {});
+      cancellationText: 'Cancel',
+    });
+    if (confirmed) {
+      dispatch(logoutUserAPI());
+    }
   };
   return (
     <Box>
@@ -45,7 +44,7 @@ const Profiles = () => {
           onClick={handleClick}
           size="small"
           sx={{ padding: 0 }}
-          aria-controls={open ? 'account-menu' : undefined}
+          aria-controls={open ? 'basic-menu-profiles' : undefined}
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
         >
@@ -62,9 +61,7 @@ const Profiles = () => {
         open={open}
         onClose={handleClose}
         onClick={handleClose}
-        slotProps={{
-          'aria-labelledby': 'basic-button-profiles',
-        }}
+        slotProps={{ list: { 'aria-labelledby': 'basic-button-profiles' } }}
       >
         <MenuItem
           sx={{

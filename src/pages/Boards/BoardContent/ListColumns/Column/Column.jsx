@@ -1,38 +1,38 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import Divider from "@mui/material/Divider";
-import Tooltip from "@mui/material/Tooltip";
-import Button from "@mui/material/Button";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Divider from '@mui/material/Divider';
+import Tooltip from '@mui/material/Tooltip';
+import Button from '@mui/material/Button';
 
-import ContentCut from "@mui/icons-material/ContentCut";
-import ContentCopy from "@mui/icons-material/ContentCopy";
-import ContentPaste from "@mui/icons-material/ContentPaste";
-import DeleteForever from "@mui/icons-material/DeleteForever";
-import Cloud from "@mui/icons-material/Cloud";
-import AddCard from "@mui/icons-material/AddCard";
-import DragHandle from "@mui/icons-material/DragHandle";
-import TextField from "@mui/material/TextField";
-import CloseIcon from "@mui/icons-material/Close";
-import ListCards from "./ListCards/ListCards";
+import ContentCut from '@mui/icons-material/ContentCut';
+import ContentCopy from '@mui/icons-material/ContentCopy';
+import ContentPaste from '@mui/icons-material/ContentPaste';
+import DeleteForever from '@mui/icons-material/DeleteForever';
+import Cloud from '@mui/icons-material/Cloud';
+import AddCard from '@mui/icons-material/AddCard';
+import DragHandle from '@mui/icons-material/DragHandle';
+import TextField from '@mui/material/TextField';
+import CloseIcon from '@mui/icons-material/Close';
+import ListCards from './ListCards/ListCards';
 
-import { cloneDeep } from "lodash";
-import { toast } from "react-toastify";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { useConfirm } from "material-ui-confirm";
+import { cloneDeep } from 'lodash';
+import { toast } from 'react-toastify';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { useConfirm } from 'material-ui-confirm';
 import {
   selectCurrentActiveBoard,
   updateCurrentActiveBoard,
-} from "~/redux/activeBoard/activeBoardSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { createNewCardAPI, deleteColumnDetailsAPI } from "~/apis";
+} from '~/redux/activeBoard/activeBoardSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { createNewCardAPI, deleteColumnDetailsAPI } from '~/apis';
 
 function Column({ column }) {
   const dispatch = useDispatch();
@@ -46,14 +46,14 @@ function Column({ column }) {
   const orderedCards = column.cards;
 
   const [openNewCardForm, setOpenNewCardForm] = useState();
-  const [newCardTitle, setNewCardTitle] = useState("");
+  const [newCardTitle, setNewCardTitle] = useState('');
 
   const toggleNewCardForm = () => {
     setOpenNewCardForm(!openNewCardForm);
   };
   const addNewCard = async () => {
     if (!newCardTitle) {
-      toast.error("Please Enter Card Title", { position: "bottom-right" });
+      toast.error('Please Enter Card Title', { position: 'bottom-right' });
       return;
     }
 
@@ -84,7 +84,7 @@ function Column({ column }) {
     dispatch(updateCurrentActiveBoard(newBoard));
 
     toggleNewCardForm();
-    setNewCardTitle("");
+    setNewCardTitle('');
   };
 
   const {
@@ -101,17 +101,17 @@ function Column({ column }) {
 
     transform: CSS.Translate.toString(transform),
     transition,
-    height: "100%",
+    height: '100%',
     opacity: isDragging ? 0.5 : undefined,
   };
   const confirmDeleteColumn = useConfirm();
   const handleDeleteColumn = async () => {
-    const { confirmed, reason } = await confirmDeleteColumn({
-      title: "Delete Column?",
+    const { confirmed } = await confirmDeleteColumn({
+      title: 'Delete Column?',
       description:
-        "This action will permanently delete this column and cards! Are you sure?",
-      confirmationText: "Confirm",
-      cancellationText: "Cancel",
+        'This action will permanently delete this column and cards! Are you sure?',
+      confirmationText: 'Confirm',
+      cancellationText: 'Cancel',
     });
     if (confirmed) {
       // Update data in the board state correctly
@@ -127,10 +127,6 @@ function Column({ column }) {
       deleteColumnDetailsAPI(column._id).then((res) => {
         toast.success(res?.deleteResult);
       });
-    } else if (reason) {
-      toast.error(`Delete cancelled: ${reason}`, {
-        position: "bottom-right",
-      });
     }
   };
 
@@ -139,13 +135,13 @@ function Column({ column }) {
       <Box
         {...listeners}
         sx={{
-          minWidth: "300px",
-          maxWidth: "300px",
+          minWidth: '300px',
+          maxWidth: '300px',
           bgcolor: (theme) =>
-            theme.palette.mode === "dark" ? "#333643" : "#ebecf0",
+            theme.palette.mode === 'dark' ? '#333643' : '#ebecf0',
           ml: 2,
-          borderRadius: "6px",
-          height: "fit-content",
+          borderRadius: '6px',
+          height: 'fit-content',
           maxHeight: (theme) =>
             `calc(${theme.trello.boardContentHeight} - ${theme.spacing(5)} )`,
         }}
@@ -155,25 +151,25 @@ function Column({ column }) {
           sx={{
             height: (theme) => theme.trello.columnHeaderHeight,
             p: 2,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
           }}
         >
           <Typography
             variant="h6"
-            sx={{ fontSize: "1rem", fontWeight: "bold", cursor: "pointer" }}
+            sx={{ fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer' }}
           >
             {column?.title}
           </Typography>
           <Box>
             <Tooltip title="More Options">
               <ExpandMoreIcon
-                sx={{ color: "text.primary", cursor: "pointer" }}
+                sx={{ color: 'text.primary', cursor: 'pointer' }}
                 id="basic-column-dropdown"
-                aria-controls={open ? "basic-menu-column-dropdown" : undefined}
+                aria-controls={open ? 'basic-menu-column-dropdown' : undefined}
                 aria-haspopup="true"
-                aria-expanded={open ? "true" : undefined}
+                aria-expanded={open ? 'true' : undefined}
                 onClick={handleClick}
               />
             </Tooltip>
@@ -184,15 +180,15 @@ function Column({ column }) {
               onClose={handleClose}
               onClick={handleClose}
               slotProps={{
-                "aria-labelledby": "basic-column-dropdown",
+                'aria-labelledby': 'basic-column-dropdown',
               }}
             >
               <MenuItem
                 onClick={toggleNewCardForm}
                 sx={{
-                  "&:hover": {
-                    color: "success.light",
-                    "& .add-card-icon": { color: "success.light" },
+                  '&:hover': {
+                    color: 'success.light',
+                    '& .add-card-icon': { color: 'success.light' },
                   },
                 }}
               >
@@ -223,9 +219,9 @@ function Column({ column }) {
               <MenuItem
                 onClick={handleDeleteColumn}
                 sx={{
-                  "&:hover": {
-                    color: "warning.dark",
-                    "& .delete-forever-icon": { color: "warning.dark" },
+                  '&:hover': {
+                    color: 'warning.dark',
+                    '& .delete-forever-icon': { color: 'warning.dark' },
                   },
                 }}
               >
@@ -260,25 +256,25 @@ function Column({ column }) {
           {!openNewCardForm ? (
             <Box
               sx={{
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
               }}
             >
               <Button startIcon={<AddCard />} onClick={toggleNewCardForm}>
                 Add new card
               </Button>
               <Tooltip title="Drag to move">
-                <DragHandle sx={{ cursor: "pointer" }} />
+                <DragHandle sx={{ cursor: 'pointer' }} />
               </Tooltip>
             </Box>
           ) : (
             <Box
               sx={{
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
                 gap: 1,
               }}
             >
@@ -292,26 +288,26 @@ function Column({ column }) {
                 value={newCardTitle}
                 onChange={(e) => setNewCardTitle(e.target.value)}
                 sx={{
-                  "& label": { color: "text.white" },
-                  "& input": {
+                  '& label': { color: 'text.white' },
+                  '& input': {
                     color: (theme) => theme.palette.primary.main,
                     bgcolor: (theme) =>
-                      theme.palette.mode === "dark" ? "#333643" : "white",
+                      theme.palette.mode === 'dark' ? '#333643' : 'white',
                   },
-                  "& label.Mui-focused": {
+                  '& label.Mui-focused': {
                     color: (theme) => theme.palette.primary.main,
                   },
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
                       borderColor: (theme) => theme.palette.primary.main,
                     },
-                    "&:hover fieldset": {
+                    '&:hover fieldset': {
                       borderColor: (theme) => theme.palette.primary.main,
                     },
-                    "&.Mui-focused fieldset": {
+                    '&.Mui-focused fieldset': {
                       borderColor: (theme) => theme.palette.primary.main,
                     },
-                    "& .MuiOutlinedInput-input": {
+                    '& .MuiOutlinedInput-input': {
                       borderRadius: 1,
                     },
                   },
@@ -319,8 +315,8 @@ function Column({ column }) {
               />
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 1,
                 }}
               >
@@ -331,11 +327,11 @@ function Column({ column }) {
                   color="success"
                   size="small"
                   sx={{
-                    boxShadow: "none",
-                    border: "0.5ox solid",
-                    color: "white",
+                    boxShadow: 'none',
+                    border: '0.5ox solid',
+                    color: 'white',
                     borderColor: (theme) => theme.palette.success.main,
-                    "&:hover": {
+                    '&:hover': {
                       bgcolor: (theme) => theme.palette.success.main,
                     },
                   }}
@@ -346,7 +342,7 @@ function Column({ column }) {
                   fontSize="small"
                   sx={{
                     color: (theme) => theme.palette.error.light,
-                    cursor: "pointer",
+                    cursor: 'pointer',
                   }}
                   onClick={toggleNewCardForm}
                 />
