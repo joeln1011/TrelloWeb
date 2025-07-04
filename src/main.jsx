@@ -1,6 +1,7 @@
 import App from '~/App.jsx';
 import theme from '~/theme.js';
 import CssBaseline from '@mui/material/CssBaseline';
+import GlobalStyles from '@mui/material/GlobalStyles';
 import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from '@mui/material/styles';
 import { ToastContainer } from 'react-toastify';
@@ -34,6 +35,7 @@ createRoot(document.getElementById('root')).render(
               },
             }}
           >
+            <GlobalStyles styles={{ a: { textDecoration: 'none' } }} />
             <CssBaseline />
             <App />
             <ToastContainer position="bottom-left" theme="colored" />
