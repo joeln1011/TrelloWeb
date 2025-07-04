@@ -13,14 +13,13 @@ import AssignmentInd from '@mui/icons-material/AssignmentInd';
 
 import FieldErrorAlert from '~/components/Form/FieldErrorAlert';
 import { FIELD_REQUIRED_MESSAGE, singleFileValidator } from '~/utils/validator';
-import { useSelector } from 'react-redux';
-import { selectCurrentUser } from '~/redux/user/userSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectCurrentUser, updateUserAPI } from '~/redux/user/userSlice';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
-  clipPath: 'inset(50%)',
   height: 1,
   overflow: 'hidden',
   position: 'absolute',
@@ -31,6 +30,7 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 export const AccountTab = () => {
+  const dispatch = useDispatch();
   const currentUser = useSelector(selectCurrentUser);
 
   // Define the initial values for the form
@@ -48,8 +48,19 @@ export const AccountTab = () => {
   });
   const submitChangeGeneralInformation = (data) => {
     const { displayName } = data;
-    console.log({ displayName });
+
     if (displayName === currentUser?.displayName) return;
+
+    toast
+      .promise(dispatch(updateUserAPI({ displayName })), {
+        pending: 'Updating...',
+      })
+      .then((res) => {
+        // If login is successful, redirect to the home page
+        if (!res.error) {
+          toast.success('User updated successfully!');
+        }
+      });
   };
 
   const uploadAvatar = (e) => {

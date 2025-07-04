@@ -16,17 +16,22 @@ import {
 } from '~/utils/validator';
 import { useForm } from 'react-hook-form';
 import { useConfirm } from 'material-ui-confirm';
+import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
+import { logoutUserAPI, updateUserAPI } from '~/redux/user/userSlice';
 
 function SecurityTab() {
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
   } = useForm();
+
   const confirmChangePassword = useConfirm();
-  const submitChangePassword = (data) => {
-    confirmChangePassword({
+  const submitChangePassword = async (data) => {
+    const { confirmed, reason } = await confirmChangePassword({
       title: (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Logout sx={{ color: 'warning.dark' }} /> Change Password
@@ -36,14 +41,23 @@ function SecurityTab() {
         'You have to login again after changing your password. Continue?',
       confirmationText: 'Confirm',
       cancellationText: 'Cancel',
-    })
-      .then(() => {
-        const { current_password, new_password, confirm_new_password } = data;
-        console.log('current_password', current_password);
-        console.log('new_password', new_password);
-        console.log('confirm_new_password', confirm_new_password);
-      })
-      .catch(() => {});
+    });
+    if (confirmed) {
+      const { current_password, new_password } = data;
+      toast
+        .promise(dispatch(updateUserAPI({ current_password, new_password })), {
+          pending: 'Updating...',
+        })
+        .then((res) => {
+          // If login is successful, redirect to the home page
+          if (!res.error) {
+            toast.success('Changed password successfully! Please login again.');
+            // Redirect to login page after changing password
+            dispatch(logoutUserAPI(false));
+          }
+        });
+    }
+    console.log(reason);
   };
   return (
     <Box
@@ -69,6 +83,7 @@ function SecurityTab() {
           <Typography variant="h5">Security Dashboard</Typography>
         </Box>
         <form onSubmit={handleSubmit(submitChangePassword)}>
+          ={false}
           <Box
             sx={{
               width: '400px',
