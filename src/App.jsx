@@ -33,6 +33,7 @@ function App() {
         {/* User Settings */}
         <Route path="/settings/account" element={<Settings />} />
         <Route path="/settings/security" element={<Settings />} />
+        <Route path="/settings/cart" element={<Settings />} />
       </Route>
 
       {/* Authentication */}
