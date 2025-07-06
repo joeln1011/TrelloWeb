@@ -1,11 +1,12 @@
+import { Routes, Route, Navigate, Outlet } from 'react-router';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '~/redux/user/userSlice';
 import Board from '~/pages/Boards/_id';
 import NotFound from '~/pages/404/NotFound';
 import Auth from '~/pages/Auth/Auth';
 import AccountVerification from '~/pages/Auth/AccountVerification';
 import Settings from '~/pages/Settings/Settings';
-import { Routes, Route, Navigate, Outlet } from 'react-router';
-import { useSelector } from 'react-redux';
-import { selectCurrentUser } from '~/redux/user/userSlice';
+import Boards from '~/pages/Boards';
 
 // ProtectedRoute component to check if the user is authenticated
 const ProtectedRoute = ({ user }) => {
@@ -30,6 +31,8 @@ function App() {
       <Route element={<ProtectedRoute user={currentUser} />}>
         {/* Board Detail */}
         <Route path="/boards/:boardId" element={<Board />} />
+        <Route path="/boards" element={<Boards />} />
+
         {/* User Settings */}
         <Route path="/settings/account" element={<Settings />} />
         <Route path="/settings/security" element={<Settings />} />
