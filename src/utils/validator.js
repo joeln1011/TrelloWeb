@@ -5,6 +5,8 @@ export const PASSWORD_RULE = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,256}$/;
 export const PASSWORD_RULE_MESSAGE =
   'Password must be at least 8 characters long and contain at least one letter and one number';
 export const PASSWORD_CONFIRMATION_MESSAGE = 'Passwords do not match';
+
+// Validation for File Uploads
 export const LIMIT_COMMON_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 export const ALLOW_COMMON_FILE_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
 export const singleFileValidator = (file) => {

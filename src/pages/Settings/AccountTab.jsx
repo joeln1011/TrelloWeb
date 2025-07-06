@@ -69,12 +69,22 @@ export const AccountTab = () => {
       toast.error(error);
       return;
     }
+
+    // Create a FormData object to send the file
     let reqData = new FormData();
     reqData.append('avatar', e.target.files[0]);
-    console.log({ reqData });
-    for (const value of reqData.values()) {
-      console.log('value:', value);
-    }
+    toast
+      .promise(dispatch(updateUserAPI(reqData)), {
+        pending: 'Updating...',
+      })
+      .then((res) => {
+        // If login is successful, redirect to the home page
+        if (!res.error) {
+          toast.success('User updated successfully!');
+        }
+        //clear the input value of the file input, if not the same file will not be uploaded again
+        e.target.value = '';
+      });
   };
   return (
     <Box

@@ -31,7 +31,7 @@ function SecurityTab() {
 
   const confirmChangePassword = useConfirm();
   const submitChangePassword = async (data) => {
-    const { confirmed, reason } = await confirmChangePassword({
+    const { confirmed } = await confirmChangePassword({
       title: (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Logout sx={{ color: 'warning.dark' }} /> Change Password
@@ -57,7 +57,6 @@ function SecurityTab() {
           }
         });
     }
-    console.log(reason);
   };
   return (
     <Box
@@ -83,7 +82,6 @@ function SecurityTab() {
           <Typography variant="h5">Security Dashboard</Typography>
         </Box>
         <form onSubmit={handleSubmit(submitChangePassword)}>
-          ={false}
           <Box
             sx={{
               width: '400px',
