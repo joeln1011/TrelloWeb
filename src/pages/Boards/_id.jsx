@@ -50,9 +50,10 @@ function Board() {
     const columnToUpdate = newBoard.columns.find(
       (column) => column._id === columnId
     );
-    columnToUpdate.cards = dndOrderedCards;
-    columnToUpdate.cardOrderIds = dndOrderedCardIds;
-
+    if (columnToUpdate) {
+      columnToUpdate.cards = dndOrderedCards;
+      columnToUpdate.cardOrderIds = dndOrderedCardIds;
+    }
     dispatch(updateCurrentActiveBoard(newBoard));
 
     //Call API to update the column with new card order
@@ -68,6 +69,7 @@ function Board() {
     dndOrderedColumns
   ) => {
     const dndOrderedColumnsIds = dndOrderedColumns.map((col) => col._id);
+
     const newBoard = { ...board };
     newBoard.columns = dndOrderedColumns;
     newBoard.columnOrderIds = dndOrderedColumnsIds;

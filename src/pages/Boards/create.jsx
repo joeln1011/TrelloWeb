@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FIELD_REQUIRED_MESSAGE } from '~/utils/validator';
+import { createNewBoardAPI } from '~/apis';
 import { styled } from '@mui/material/styles';
 
 import Box from '@mui/material/Box';
@@ -17,7 +18,8 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import LibraryAdd from '@mui/icons-material/LibraryAdd';
 import Cancel from '@mui/icons-material/Cancel';
 import Modal from '@mui/material/Modal';
-
+import CloudUpload from '@mui/icons-material/CloudUpload';
+import Tooltip from '@mui/material/Tooltip';
 const SideBarItem = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -37,11 +39,20 @@ const SideBarItem = styled(Box)(({ theme }) => ({
 }));
 
 const BOARD_TYPES = {
-  PUBLIC: 'Public',
-  PRIVATE: 'Private',
+  PUBLIC: 'public',
+  PRIVATE: 'private',
 };
-
-function SidebarCreateBoardModal() {
+// const VisuallyHiddenInput = styled('input')({
+//   clip: 'rect(0 0 0 0)',
+//   height: 1,
+//   overflow: 'hidden',
+//   position: 'absolute',
+//   bottom: 0,
+//   left: 0,
+//   whiteSpace: 'nowrap',
+//   width: 1,
+// });
+function SidebarCreateBoardModal({ afterFetchBoards }) {
   const {
     control,
     register,
@@ -57,8 +68,10 @@ function SidebarCreateBoardModal() {
   };
 
   const submitCreateNewBoard = (data) => {
-    const { title, description, type } = data;
-    console.log({ title, description, type });
+    createNewBoardAPI(data).then(() => {
+      handleCloseModal();
+      afterFetchBoards();
+    });
   };
 
   return (
@@ -178,37 +191,58 @@ function SidebarCreateBoardModal() {
                   />
                   <FieldErrorAlert errors={errors} fieldName={'description'} />
                 </Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    gap: 2,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Controller
+                    name="type"
+                    defaultValue={BOARD_TYPES.PUBLIC}
+                    control={control}
+                    render={({ field }) => (
+                      <RadioGroup
+                        {...field}
+                        row
+                        onChange={(event, value) => {
+                          field.onChange(value);
+                        }}
+                        value={field.value}
+                      >
+                        <FormControlLabel
+                          value={BOARD_TYPES.PUBLIC}
+                          control={<Radio size="small" />}
+                          label="Public"
+                          labelPlacement="start"
+                        />
+                        <FormControlLabel
+                          value={BOARD_TYPES.PRIVATE}
+                          control={<Radio size="small" />}
+                          label="Private"
+                          labelPlacement="start"
+                        />
+                      </RadioGroup>
+                    )}
+                  />
 
-                <Controller
-                  name="type"
-                  defaultValue={BOARD_TYPES.PUBLIC}
-                  control={control}
-                  render={({ field }) => (
-                    <RadioGroup
-                      {...field}
-                      row
-                      onChange={(event, value) => {
-                        field.onChange(value);
-                      }}
-                      value={field.value}
-                    >
-                      <FormControlLabel
-                        value={BOARD_TYPES.PUBLIC}
-                        control={<Radio size="small" />}
-                        label="Public"
-                        labelPlacement="start"
-                      />
-                      <FormControlLabel
-                        value={BOARD_TYPES.PRIVATE}
-                        control={<Radio size="small" />}
-                        label="Private"
-                        labelPlacement="start"
-                      />
-                    </RadioGroup>
-                  )}
-                />
+                  {/* <Box>
+                    <Tooltip title="Upload your board cover image">
+                      <Button
+                        component="label"
+                        variant="contained"
+                        startIcon={<CloudUpload />}
+                        size="small"
+                      >
+                        Upload Cover Image
+                        <VisuallyHiddenInput type="file" />
+                      </Button>
+                    </Tooltip>
+                  </Box> */}
+                </Box>
 
-                <Box sx={{ alignSelf: 'flex-end' }}>
+                <Box sx={{ alignSelf: 'flex-start' }}>
                   <Button
                     className="interceptor-loading"
                     type="submit"
