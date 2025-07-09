@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -21,6 +20,7 @@ import DragHandle from '@mui/icons-material/DragHandle';
 import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import ListCards from './ListCards/ListCards';
+import ToggleFocusInput from '~/components/Form/ToggleFocusInput';
 
 import { cloneDeep } from 'lodash';
 import { toast } from 'react-toastify';
@@ -32,7 +32,11 @@ import {
   updateCurrentActiveBoard,
 } from '~/redux/activeBoard/activeBoardSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { createNewCardAPI, deleteColumnDetailsAPI } from '~/apis';
+import {
+  createNewCardAPI,
+  deleteColumnDetailsAPI,
+  updateColumnDetailsAPI,
+} from '~/apis';
 
 function Column({ column }) {
   const dispatch = useDispatch();
@@ -129,6 +133,17 @@ function Column({ column }) {
       });
     }
   };
+  const onUpdateColumnTitle = (newTitle) => {
+    // Call API to update column title and handle data of board in redux
+    updateColumnDetailsAPI(column._id, { title: newTitle }).then(() => {
+      const newBoard = cloneDeep(board);
+      const columnToUpdate = newBoard.columns.find(
+        (col) => col._id === column._id
+      );
+      if (columnToUpdate) columnToUpdate.title = newTitle;
+      dispatch(updateCurrentActiveBoard(newBoard));
+    });
+  };
 
   return (
     <div ref={setNodeRef} style={dndKitColumnStyles} {...attributes}>
@@ -156,12 +171,11 @@ function Column({ column }) {
             justifyContent: 'space-between',
           }}
         >
-          <Typography
-            variant="h6"
-            sx={{ fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer' }}
-          >
-            {column?.title}
-          </Typography>
+          <ToggleFocusInput
+            value={column?.title}
+            onChangedValue={onUpdateColumnTitle}
+            data-no-dnd="true"
+          />
           <Box>
             <Tooltip title="More Options">
               <ExpandMoreIcon

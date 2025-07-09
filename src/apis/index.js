@@ -96,3 +96,12 @@ export const fetchBoardsAPI = async (searchPath) => {
   );
   return response.data;
 };
+
+export const createNewBoardAPI = async (data) => {
+  const response = await authorizeAxiosInstance.post(
+    `${API_ROOT}/v1/boards`,
+    data
+  );
+  toast.success('Board created successfully!');
+  return response.data;
+};

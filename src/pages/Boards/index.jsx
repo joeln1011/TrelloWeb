@@ -21,7 +21,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Pagination from '@mui/material/Pagination';
 import PaginationItem from '@mui/material/PaginationItem';
 import SidebarCreateBoardModal from './create';
-import randomColor from 'randomcolor';
+//import randomColor from 'randomcolor';
 
 const SideBarItem = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -49,18 +49,20 @@ function Boards() {
   const pageParam = query.get('page');
   const page = pageParam ? parseInt(pageParam, 10) : 1;
   const safePage = isNaN(page) || page < 1 ? 1 : page;
+  const updateStateData = (res) => {
+    setBoards(res.boards || []);
+    setTotalBoards(res.totalBoards || 0);
+  };
 
+  // Call API to fetch boards
   useEffect(() => {
-    fetchBoardsAPI(location.search).then((res) => {
-      const boardsWithColors = (res.boards || []).map((board) => ({
-        ...board,
-        color: randomColor(),
-      }));
-
-      setBoards(boardsWithColors);
-      setTotalBoards(res.totalBoards || 0);
-    });
+    fetchBoardsAPI(location.search).then(updateStateData);
   }, [location.search]);
+
+  // Function to refetch boards after creating a new board
+  const afterFetchBoards = () => {
+    fetchBoardsAPI(location.search).then(updateStateData);
+  };
 
   if (!boards) {
     return <PageLoadingSpinner caption="Loading Boards..." />;
@@ -88,7 +90,7 @@ function Boards() {
             </Stack>
             <Divider sx={{ my: 1 }} />
             <Stack direction="column" spacing={1}>
-              <SidebarCreateBoardModal />
+              <SidebarCreateBoardModal afterFetchBoards={afterFetchBoards} />
             </Stack>
           </Grid>
 
@@ -104,9 +106,16 @@ function Boards() {
             {boards?.length > 0 && (
               <Grid container spacing={2}>
                 {boards.map((b) => (
-                  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={b._id}>
+                  <Grid size="auto" key={b._id}>
                     <Card sx={{ width: '250px' }}>
-                      <Box sx={{ height: '50px', backgroundColor: b.color }} />
+                      <CardMedia
+                        component="img"
+                        height="100"
+                        image="https://picsum.photos/100"
+                      />
+                      {/* <Box
+                        sx={{ height: '50px', backgroundColor: randomColor() }}
+                      /> */}
                       <CardContent sx={{ p: 1.5, '&:last-child': { p: 1.5 } }}>
                         <Typography gutterBottom variant="h6" component="div">
                           {b?.title}
@@ -124,7 +133,7 @@ function Boards() {
                         </Typography>
                         <Box
                           component={Link}
-                          to={`boards/${b._id}`}
+                          to={`/boards/${b._id}`}
                           sx={{
                             mt: 1,
                             display: 'flex',
