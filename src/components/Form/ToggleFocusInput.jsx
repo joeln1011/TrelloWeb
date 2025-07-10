@@ -9,11 +9,9 @@ function ToggleFocusInput({
 }) {
   const [inputValue, setInputValue] = useState(value);
   const triggerBlur = () => {
-    if (!inputValue) {
-      setInputValue(inputValue.trim());
-      if (!inputValue || inputValue.trim() === value) {
-        setInputValue(value);
-      }
+    setInputValue(inputValue.trim());
+    if (!inputValue || inputValue.trim() === value) {
+      setInputValue(value);
       return;
     }
     if (inputValue === value) return;

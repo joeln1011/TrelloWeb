@@ -1,4 +1,3 @@
-import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
@@ -10,24 +9,14 @@ import CloudUpload from '@mui/icons-material/CloudUpload';
 import Mail from '@mui/icons-material/Mail';
 import AccountBox from '@mui/icons-material/AccountBox';
 import AssignmentInd from '@mui/icons-material/AssignmentInd';
-
 import FieldErrorAlert from '~/components/Form/FieldErrorAlert';
+import VisuallyHiddenInput from '~/components/Form/VisuallyHiddenInput';
+
 import { FIELD_REQUIRED_MESSAGE, singleFileValidator } from '~/utils/validator';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser, updateUserAPI } from '~/redux/user/userSlice';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-
-const VisuallyHiddenInput = styled('input')({
-  clip: 'rect(0 0 0 0)',
-  height: 1,
-  overflow: 'hidden',
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  whiteSpace: 'nowrap',
-  width: 1,
-});
 
 export const AccountTab = () => {
   const dispatch = useDispatch();
