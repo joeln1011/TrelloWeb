@@ -1,16 +1,16 @@
-import authorizeAxiosInstance from "~/utils/authorizeAxios";
-import { mapOrder } from "~/utils/sorts";
-import { generatePlaceholderCard } from "~/utils/formatters";
-import { isEmpty } from "lodash";
-import { API_ROOT } from "~/utils/constants";
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import authorizeAxiosInstance from '~/utils/authorizeAxios';
+import { mapOrder } from '~/utils/sorts';
+import { generatePlaceholderCard } from '~/utils/formatters';
+import { isEmpty } from 'lodash';
+import { API_ROOT } from '~/utils/constants';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 const initialState = {
   currentActiveBoard: null,
 };
 
 export const fetchBoardDetailsAPI = createAsyncThunk(
-  "activeBoard/fetchBoardDetailAPI",
+  'activeBoard/fetchBoardDetailAPI',
   async (boardId) => {
     const response = await authorizeAxiosInstance.get(
       `${API_ROOT}/v1/boards/${boardId}`
@@ -20,7 +20,7 @@ export const fetchBoardDetailsAPI = createAsyncThunk(
 );
 
 export const activeBoardSlice = createSlice({
-  name: "activeBoard",
+  name: 'activeBoard',
   initialState,
 
   // The `reducers` field lets us define reducers and generate associated actions
@@ -31,6 +31,21 @@ export const activeBoardSlice = createSlice({
       //Update the current active board
       state.currentActiveBoard = board;
     },
+    updateCardInBoard: (state, action) => {
+      // Update nested data
+      const incomingCard = action.payload;
+      const column = state.currentActiveBoard.columns.find(
+        (i) => i._id === incomingCard.columnId
+      );
+      if (column) {
+        const card = column.cards.find((i) => i._id === incomingCard._id);
+        if (card) {
+          Object.keys(incomingCard).forEach((key) => {
+            card[key] = incomingCard[key];
+          });
+        }
+      }
+    },
   },
 
   //
@@ -39,8 +54,11 @@ export const activeBoardSlice = createSlice({
       // action.payload is response.data reuturned from the API
       let board = action.payload;
 
+      //Combine members of owners and members
+      board.FE_allUsers = board.owners.concat(board.members);
+
       // Sort columns here before setting the board state
-      board.columns = mapOrder(board.columns, board.columnOrderIds, "_id");
+      board.columns = mapOrder(board.columns, board.columnOrderIds, '_id');
 
       board.columns.forEach((column) => {
         // Handle case where a column has no cards
@@ -49,7 +67,7 @@ export const activeBoardSlice = createSlice({
           column.cardOrderIds = [generatePlaceholderCard(column)._id];
         } else {
           // Sort cards here before setting the board state
-          column.cards = mapOrder(column.cards, column.cardOrderIds, "_id");
+          column.cards = mapOrder(column.cards, column.cardOrderIds, '_id');
         }
       });
 
@@ -59,7 +77,8 @@ export const activeBoardSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { updateCurrentActiveBoard } = activeBoardSlice.actions;
+export const { updateCurrentActiveBoard, updateCardInBoard } =
+  activeBoardSlice.actions;
 
 // Selectors
 export const selectCurrentActiveBoard = (state) => {

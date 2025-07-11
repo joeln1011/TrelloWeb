@@ -6,25 +6,17 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import EditNote from '@mui/icons-material/EditNote';
 
-const markdownValueExample = `
-*\`Markdown Content Example\`*
-
-**Hello World!**
-[![](https://example.com/image.png)](https://example.com)
-\`\`\`javascript
-import Ract from 'react';
-import ReactDom from 'react=dom';
-import MDEditor from '@uiw/react-md-editor';
-\`\`\`
-`;
-
-function CardDescriptionMdEditor() {
+function CardDescriptionMdEditor({
+  cardDescriptionProp,
+  handleUpdateCardDescription,
+}) {
   const { mode } = useColorScheme();
   const [markdownEditMode, setMardownEditMode] = useState(false);
-  const [cardDescription, setCardDescription] = useState(markdownValueExample);
+  const [cardDescription, setCardDescription] = useState(cardDescriptionProp);
+
   const updateCardDescription = () => {
     setMardownEditMode(false);
-    console.log('Updated Card Description:', cardDescription);
+    handleUpdateCardDescription(cardDescription);
   };
   return (
     <Box sx={{ mt: -4 }}>
@@ -60,6 +52,7 @@ function CardDescriptionMdEditor() {
             variant="outlined"
             color="info"
             size="small"
+            startIcon={<EditNote />}
           >
             Edit
           </Button>
@@ -68,8 +61,10 @@ function CardDescriptionMdEditor() {
               source={cardDescription}
               style={{
                 whiteSpace: 'pre-wrap',
-                padding: '10px',
-                border: '0.5px solid rbga(0,0,0,0.2)',
+                padding: cardDescription ? '10px' : '0px',
+                border: cardDescription
+                  ? '0.5px solid rbga(0,0,0,0.2)'
+                  : 'none',
                 borderRadius: '8px',
               }}
             />
