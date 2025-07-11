@@ -1,6 +1,3 @@
-import { singleFileValidator } from '~/utils/validator';
-import { toast } from 'react-toastify';
-
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
@@ -34,11 +31,14 @@ import CardUserGroup from './CardUserGroup';
 import CardDescriptionMdEditor from './CardDecriptionMdEditor';
 import CardAcitvitySection from './CardActivitySection';
 
+import { singleFileValidator } from '~/utils/validator';
+import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  clearCurrentActiveCard,
+  clearAndHideCurrentActiveCard,
   selectCurrentActiveCard,
   updateCurrentActiveCard,
+  selectIsShowModalActiveCard,
 } from '~/redux/activeCard/activeCardSlice';
 import { updateCardDetailsAPI } from '~/apis';
 import { updateCardInBoard } from '~/redux/activeBoard/activeBoardSlice';
@@ -69,8 +69,10 @@ const SidebarItem = styled(Box)(({ theme }) => ({
 function ActiveCard() {
   const dispatch = useDispatch();
   const activeCard = useSelector(selectCurrentActiveCard);
+  const isShowModalActiveCard = useSelector(selectIsShowModalActiveCard);
+
   const handleCloseModal = () => {
-    dispatch(clearCurrentActiveCard());
+    dispatch(clearAndHideCurrentActiveCard());
   };
 
   // Function
@@ -107,11 +109,14 @@ function ActiveCard() {
       { pending: 'Uploading card cover...' }
     );
   };
+  const onAddCardComment = async (commentToAdd) => {
+    await callApiUpdateCard({ commentToAdd });
+  };
 
   return (
     <Modal
       disableScrollLock
-      open={true}
+      open={isShowModalActiveCard}
       onClose={handleCloseModal}
       sx={{ overflowY: 'auto' }}
     >
@@ -218,7 +223,10 @@ function ActiveCard() {
                   Activity
                 </Typography>
               </Box>
-              <CardAcitvitySection />
+              <CardAcitvitySection
+                cardComments={activeCard?.comments}
+                onAddCardComment={onAddCardComment}
+              />
             </Box>
           </Grid>
 
