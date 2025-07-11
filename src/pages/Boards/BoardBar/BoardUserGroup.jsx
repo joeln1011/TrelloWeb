@@ -4,7 +4,7 @@ import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import Popover from '@mui/material/Popover';
 
-function BoardUserGroup({ boardUsers = [], limit = 8 }) {
+function BoardUserGroup({ boardUsers = [], limit = 4 }) {
   const [anchorPopoverElement, setAnchorPopoverElement] = useState(null);
   const isOpenPopover = Boolean(anchorPopoverElement);
   const popoverId = isOpenPopover ? 'board-all-user-popover' : undefined;
@@ -16,14 +16,14 @@ function BoardUserGroup({ boardUsers = [], limit = 8 }) {
   return (
     <Box sx={{ display: 'flex', gap: '4px' }}>
       {/* display the number of user base on limit */}
-      {[...Array(16)].map((_, index) => {
+      {boardUsers.map((user, index) => {
         if (index < limit) {
           return (
-            <Tooltip title="joelnguyen" key={index}>
+            <Tooltip title={user?.displayName} key={index}>
               <Avatar
                 sx={{ width: 34, height: 34, cursor: 'pointer' }}
                 alt="joelnguyen"
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtbpaeieipxghtOKgVNA5hZF3UXKVxeQRj4mkeMiNPHVmLDGRqhYMNDHtFe2W10sJQqcY&usqp=CAU"
+                src={user?.avatar}
               />
             </Tooltip>
           );
@@ -31,7 +31,7 @@ function BoardUserGroup({ boardUsers = [], limit = 8 }) {
       })}
 
       {/* if users are more than limit will show +number  */}
-      {[...Array(16)].length > limit && (
+      {boardUsers.length > limit && (
         <Tooltip title="Show more">
           <Box
             aria-describedby={popoverId}
@@ -50,7 +50,7 @@ function BoardUserGroup({ boardUsers = [], limit = 8 }) {
               backgroundColor: '#a4b0be',
             }}
           >
-            +{[...Array(16)].length - limit}
+            +{boardUsers.length - limit}
           </Box>
         </Tooltip>
       )}
@@ -70,12 +70,12 @@ function BoardUserGroup({ boardUsers = [], limit = 8 }) {
             gap: 1,
           }}
         >
-          {[...Array(16)].map((_, index) => (
-            <Tooltip title="joelnguyen" key={index}>
+          {boardUsers.map((user, index) => (
+            <Tooltip title={user?.displayName} key={index}>
               <Avatar
                 sx={{ width: 34, height: 34, cursor: 'pointer' }}
                 alt="joelnguyen"
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTX8Ixi8EqHVQbS8q-m0yGC4Hc-sFMbIeGulLZ_DwugVeYzIsMrkcIKU3hvH0anZLdWygc&usqp=CAU"
+                src={user?.avatar}
               />
             </Tooltip>
           ))}

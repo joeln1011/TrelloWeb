@@ -41,8 +41,10 @@ import {
   updateCurrentActiveCard,
 } from '~/redux/activeCard/activeCardSlice';
 import { updateCardDetailsAPI } from '~/apis';
+import { updateCardInBoard } from '~/redux/activeBoard/activeBoardSlice';
 
 import { styled } from '@mui/material/styles';
+
 const SidebarItem = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -74,16 +76,20 @@ function ActiveCard() {
   // Function
   const callApiUpdateCard = async (updatedData) => {
     const updatedCard = await updateCardDetailsAPI(activeCard._id, updatedData);
-
     // Update active card in current modal
-    dispatch(updateCurrentActiveCard(updatedData));
+    dispatch(updateCurrentActiveCard(updatedCard));
     // Update data in card in activeBoard (nested data)
+    dispatch(updateCardInBoard(updatedCard));
 
     return updatedCard;
   };
 
   const onUpdateCardTitle = (newTitle) => {
     callApiUpdateCard({ title: newTitle.trim() });
+  };
+
+  const onUpdateCardDescription = (newDescription) => {
+    callApiUpdateCard({ description: newDescription });
   };
 
   const onUploadCardCover = (event) => {
@@ -96,6 +102,10 @@ function ActiveCard() {
     let reqData = new FormData();
     reqData.append('cardCover', event.target?.files[0]);
     // Call API to upload card cover
+    toast.promise(
+      callApiUpdateCard(reqData).finally(() => (event.target.value = '')),
+      { pending: 'Uploading card cover...' }
+    );
   };
 
   return (
@@ -192,7 +202,10 @@ function ActiveCard() {
                   Description
                 </Typography>
               </Box>
-              <CardDescriptionMdEditor />
+              <CardDescriptionMdEditor
+                cardDescriptionProp={activeCard?.description}
+                handleUpdateCardDescription={onUpdateCardDescription}
+              />
             </Box>
 
             <Box sx={{ mb: 3 }}>

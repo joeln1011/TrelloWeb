@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { FIELD_REQUIRED_MESSAGE } from '~/utils/validator';
+import { FIELD_REQUIRED_MESSAGE, singleFileValidator } from '~/utils/validator';
 import { createNewBoardAPI } from '~/apis';
-import { styled } from '@mui/material/styles';
+import { toast } from 'react-toastify';
 
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -18,8 +18,12 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import LibraryAdd from '@mui/icons-material/LibraryAdd';
 import Cancel from '@mui/icons-material/Cancel';
 import Modal from '@mui/material/Modal';
-import CloudUpload from '@mui/icons-material/CloudUpload';
+import ImageOutlined from '@mui/icons-material/ImageOutlined';
 import Tooltip from '@mui/material/Tooltip';
+import AttachFile from '@mui/icons-material/AttachFile';
+import VisuallyHiddenInput from '~/components/Form/VisuallyHiddenInput';
+
+import { styled } from '@mui/material/styles';
 const SideBarItem = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -42,16 +46,7 @@ const BOARD_TYPES = {
   PUBLIC: 'public',
   PRIVATE: 'private',
 };
-// const VisuallyHiddenInput = styled('input')({
-//   clip: 'rect(0 0 0 0)',
-//   height: 1,
-//   overflow: 'hidden',
-//   position: 'absolute',
-//   bottom: 0,
-//   left: 0,
-//   whiteSpace: 'nowrap',
-//   width: 1,
-// });
+
 function SidebarCreateBoardModal({ afterFetchBoards }) {
   const {
     control,
@@ -72,6 +67,21 @@ function SidebarCreateBoardModal({ afterFetchBoards }) {
       handleCloseModal();
       afterFetchBoards();
     });
+  };
+
+  const onUploadBoardCover = (event) => {
+    const error = singleFileValidator(event.target?.files[0]);
+    if (error) {
+      toast.error(error);
+      return;
+    }
+    let reqData = new FormData();
+    reqData.append('boardCover', event.target?.files[0]);
+    // Call API to upload card cover
+    // toast.promise(
+    //   callApiUpdateBoard(reqData).finally(() => (event.target.value = '')),
+    //   { pending: 'Uploading Board cover...' }
+    // );
   };
 
   return (
@@ -226,23 +236,31 @@ function SidebarCreateBoardModal({ afterFetchBoards }) {
                       </RadioGroup>
                     )}
                   />
-
-                  {/* <Box>
-                    <Tooltip title="Upload your board cover image">
-                      <Button
-                        component="label"
-                        variant="contained"
-                        startIcon={<CloudUpload />}
-                        size="small"
-                      >
-                        Upload Cover Image
-                        <VisuallyHiddenInput type="file" />
-                      </Button>
-                    </Tooltip>
-                  </Box> */}
+                </Box>
+                <Box display="flex" gap={2} justifyContent="space-between">
+                  <Tooltip title="Upload your board cover image">
+                    <Button
+                      component="label"
+                      variant="outlined"
+                      startIcon={<ImageOutlined />}
+                      size="small"
+                    >
+                      Upload Cover Image
+                      <VisuallyHiddenInput
+                        type="file"
+                        onChange={onUploadBoardCover}
+                      />
+                    </Button>
+                  </Tooltip>
+                  <Typography
+                    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                  >
+                    <AttachFile fontSize="small" />
+                    cat.png
+                  </Typography>
                 </Box>
 
-                <Box sx={{ alignSelf: 'flex-start' }}>
+                <Box sx={{ alignSelf: 'flex-end' }}>
                   <Button
                     className="interceptor-loading"
                     type="submit"
