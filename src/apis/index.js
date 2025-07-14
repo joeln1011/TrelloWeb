@@ -113,3 +113,12 @@ export const updateCardDetailsAPI = async (cardId, updateData) => {
   );
   return response.data;
 };
+
+export const inviteUserToBoardAPI = async (data) => {
+  const response = await authorizeAxiosInstance.post(
+    `${API_ROOT}/v1/invitations/board`,
+    data
+  );
+  toast.success('User invited to board successfully!');
+  return response.data;
+};
