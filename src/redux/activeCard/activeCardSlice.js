@@ -23,7 +23,7 @@ export const activeCardSlice = createSlice({
       state.currentActiveCard = fullCard;
     },
   },
-  extraReducers: (builder) => {},
+  extraReducers: () => {},
 });
 export const {
   clearAndHideCurrentActiveCard,
