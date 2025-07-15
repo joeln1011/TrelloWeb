@@ -14,6 +14,7 @@ import {
   FIELD_REQUIRED_MESSAGE,
 } from '~/utils/validator';
 import { inviteUserToBoardAPI } from '~/apis';
+import { socketIoInstance } from '~/main';
 
 function InviteBoardUser({ boardId }) {
   const [anchorPopoverElement, setAnchorPopoverElement] = useState(null);
@@ -34,11 +35,12 @@ function InviteBoardUser({ boardId }) {
 
   const submitInviteUserToBoard = (data) => {
     const { inviteeEmail } = data;
-    inviteUserToBoardAPI({ inviteeEmail, boardId }).then(() => {
+    inviteUserToBoardAPI({ inviteeEmail, boardId }).then((invitation) => {
       //Clear input field after submission and close popover
       setValue('inviteeEmail', null);
       setAnchorPopoverElement(null);
-      //socket io to do real-time update
+      // Emit an event to notify other users about the new invitation
+      socketIoInstance.emit('FE_USER_INVITED_TO_BOARD', invitation);
     });
   };
 
