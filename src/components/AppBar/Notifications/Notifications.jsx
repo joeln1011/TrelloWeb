@@ -15,7 +15,7 @@ import Done from '@mui/icons-material/Done';
 import NotInterested from '@mui/icons-material/NotInterested';
 
 import { useNavigate } from 'react-router-dom';
-import { socketIoInstance } from '~/main';
+import { socketIoInstance } from '~/socketClient';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchInvitationsAPI,
