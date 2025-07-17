@@ -14,7 +14,7 @@ import {
   FIELD_REQUIRED_MESSAGE,
 } from '~/utils/validator';
 import { inviteUserToBoardAPI } from '~/apis';
-import { socketIoInstance } from '~/main';
+import { socketIoInstance } from '~/socketClient';
 
 function InviteBoardUser({ boardId }) {
   const [anchorPopoverElement, setAnchorPopoverElement] = useState(null);
