@@ -20,10 +20,10 @@ function CardUserGroup({ cardMemberIds = [], onUpdateCardMemmbers }) {
     else setAnchorPopoverElement(null);
   };
   const board = useSelector(selectCurrentActiveBoard);
-  const FE_CardMembers = board.FE_allUsers?.filter((user) =>
-    cardMemberIds.includes(user._id)
-  );
-  console.log('CardUserGroup FE_CardMembers: ', FE_CardMembers);
+  const FE_CardMembers = cardMemberIds.map((userId) => {
+    return board.FE_allUsers.find((user) => user._id === userId);
+  });
+
   const handleUpdateCardMembers = (user) => {
     const incomingMemberInfo = {
       userId: user._id,
