@@ -42,9 +42,10 @@ import {
 } from '~/redux/activeCard/activeCardSlice';
 import { updateCardDetailsAPI } from '~/apis';
 import { updateCardInBoard } from '~/redux/activeBoard/activeBoardSlice';
+import { selectCurrentUser } from '~/redux/user/userSlice';
+import { CARD_MEMBER_ACTIONS } from '~/utils/constants';
 
 import { styled } from '@mui/material/styles';
-
 const SidebarItem = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -70,6 +71,7 @@ function ActiveCard() {
   const dispatch = useDispatch();
   const activeCard = useSelector(selectCurrentActiveCard);
   const isShowModalActiveCard = useSelector(selectIsShowModalActiveCard);
+  const currentUser = useSelector(selectCurrentUser);
 
   const handleCloseModal = () => {
     dispatch(clearAndHideCurrentActiveCard());
@@ -95,7 +97,6 @@ function ActiveCard() {
   };
 
   const onUploadCardCover = (event) => {
-    console.log(event.target.files[0]);
     const error = singleFileValidator(event.target?.files[0]);
     if (error) {
       toast.error(error);
@@ -243,10 +244,21 @@ function ActiveCard() {
               Add To Card
             </Typography>
             <Stack direction="column" spacing={1}>
-              <SidebarItem className="active">
-                <PersonOutlineOutlined fontSize="small" />
-                Join
-              </SidebarItem>
+              {!activeCard?.memberIds?.includes(currentUser._id) && (
+                <SidebarItem
+                  className="active"
+                  onClick={() =>
+                    onUpdateCardMemmbers({
+                      userId: currentUser._id,
+                      action: CARD_MEMBER_ACTIONS.ADD,
+                    })
+                  }
+                >
+                  <PersonOutlineOutlined fontSize="small" />
+                  Join
+                </SidebarItem>
+              )}
+
               <SidebarItem className="active" component="label">
                 <ImageOutlined fontSize="small" />
                 Cover
@@ -261,14 +273,17 @@ function ActiveCard() {
                 <LocalOfferOutlined fontSize="small" />
                 Labels
               </SidebarItem>
+
               <SidebarItem className="active" component="label">
                 <TaskAltOutlined fontSize="small" />
                 Checklist
               </SidebarItem>
+
               <SidebarItem className="active" component="label">
                 <WatchLaterOutlined fontSize="small" />
                 Dates
               </SidebarItem>
+
               <SidebarItem className="active" component="label">
                 <AutoFixHighOutlined fontSize="small" />
                 Custom Fields
